@@ -1,0 +1,239 @@
+rules.md
+# .gitignore - Files and folders that Git should ignore
+# This keeps sensitive data, generated files, and local artifacts out of version control
+
+# ============================================================================
+# Python-specific ignores
+# ============================================================================
+
+# Byte-compiled / optimized / DLL files
+# These are generated when Python runs your code for faster loading next time
+__pycache__/              # Folder containing compiled Python files
+*.py[cod]                 # .pyc, .pyo, .pyd files
+*$py.class                # More compiled files
+
+# C extensions (compiled code)
+*.so                      # Shared object files (Linux/Mac)
+*.dll                     # Dynamic link libraries (Windows)
+*.dylib                   # Dynamic libraries (Mac)
+
+# Distribution / packaging
+# These are created when building your project for distribution
+.Python                   # Python installation marker
+build/                    # Build artifacts
+develop-eggs/
+dist/                     # Distribution packages (when you run: uv build)
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/              # Package metadata
+.installed.cfg
+*.egg
+MANIFEST
+
+# PyInstaller
+# If you bundle your Python app into an executable
+*.manifest
+*.spec
+
+# ============================================================================
+# Virtual Environments
+# ============================================================================
+
+# uv creates a .venv folder with all your installed packages
+# This should NEVER be committed - each developer creates their own
+.venv/                   # uv's virtual environment
+venv/                    # Alternative venv name
+ENV/
+env/
+.python-version          # Python version file (if using pyenv)
+
+# ============================================================================
+# Testing & Coverage
+# ============================================================================
+
+# pytest cache
+.pytest_cache/           # pytest stores test results here
+.tox/                    # Testing tool cache
+.nox/                    # Another testing tool
+.coverage                # Code coverage data
+.coverage.*
+htmlcov/                 # HTML coverage reports
+*.cover
+*.py,cover
+.hypothesis/             # Property-based testing cache
+.cache/                  # General cache folder
+
+# ============================================================================
+# Jupyter Notebook (if used for exploration)
+# ============================================================================
+
+.ipynb_checkpoints       # Jupyter auto-saves
+*.ipynb                  # Uncomment if you don't want to commit notebooks
+
+# ============================================================================
+# Environment Variables & Credentials
+# ============================================================================
+
+# CRITICAL: These files contain secrets and must NEVER be committed!
+.env                     # Your environment variables (API keys, passwords)
+.env.*                   # Any environment file variants (.env.local, .env.prod)
+*.env                    # Catch-all for env files
+
+# Credentials & keys
+credentials/             # Folder for GCP service account keys
+*.json                   # Be careful - this ignores ALL .json files
+!pyproject.toml          # Except we want to keep pyproject.toml
+*.pem                    # Private key files
+*.key                    # Key files
+*.crt                    # Certificate files
+*.p12                    # Certificate bundles
+*.pfx                    # Certificate files
+secrets.*                # Any file starting with "secrets"
+
+# ============================================================================
+# Data Files (Local Storage)
+# ============================================================================
+
+# Your data/ folder should NOT be committed - it can get huge!
+data/                    # All local data
+*.csv                    # CSV files (from LTA API)
+*.parquet                # Parquet files (compressed data)
+*.zip                    # ZIP files (LTA API downloads)
+*.gz                     # Gzip compressed files
+*.tar                    # Tar archives
+
+# But allow sample/example data (if you create it)
+!data/samples/
+!data/examples/
+
+# ============================================================================
+# IDE & Editor Files
+# ============================================================================
+
+# VSCode
+.vscode/                 # VSCode settings (personal preferences)
+!.vscode/settings.json   # Uncomment if you want shared team settings
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# Cursor
+.cursor/                 # Cursor IDE files
+!.cursor/rules/          # Keep cursor rules for the project
+
+# PyCharm
+.idea/                   # PyCharm project files
+*.iml
+
+# Other editors
+.DS_Store                # macOS file manager metadata
+Thumbs.db                # Windows thumbnail cache
+*.swp                    # Vim swap files
+*.swo                    # Vim swap files
+*~                       # Backup files
+
+# ============================================================================
+# Docker (when we add it later)
+# ============================================================================
+
+# Docker volumes and build cache
+.dockerignore            # Uncomment if you want to ignore this
+docker-compose.override.yml  # Local docker-compose overrides
+
+# ============================================================================
+# Terraform (when we add it later)
+# ============================================================================
+
+# Terraform state and variables
+*.tfstate                # Terraform state (contains infrastructure info)
+*.tfstate.*
+*.tfvars                 # Terraform variables (may contain sensitive values)
+.terraform/              # Terraform plugins and modules
+.terraform.lock.hcl      # Uncomment if you want to ignore lock file
+
+# ============================================================================
+# Logs & Temporary Files
+# ============================================================================
+
+# Application logs
+*.log                    # Log files
+logs/                    # Logs directory
+*.out                    # Output files
+*.err                    # Error files
+
+# Airflow (when we add it later)
+airflow/logs/            # Airflow execution logs
+airflow/*.db             # Airflow SQLite database (local only)
+airflow/*.pid            # Process ID files
+airflow/airflow.cfg      # Local Airflow config (use template instead)
+
+# Temporary files
+tmp/                     # Temporary directory
+temp/                    # Alternative temp directory
+*.tmp                    # Temporary files
+.cache/                  # Cache directory
+
+# ============================================================================
+# Operating System Files
+# ============================================================================
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+*.stackdump
+[Dd]esktop.ini
+
+# Linux
+*~
+.directory
+.Trash-*
+
+# ============================================================================
+# Documentation Build Files
+# ============================================================================
+
+# Sphinx documentation (if we add it)
+docs/_build/
+docs/.doctrees/
+
+# ============================================================================
+# Project-specific ignores
+# ============================================================================
+
+# Keep this at the end for any custom project files you want to ignore
+rules.md                 # Your existing rule (keeping it)
+
+# ============================================================================
+# Important: What SHOULD be committed
+# ============================================================================
+
+# DO commit:
+# - Source code (src/)
+# - Tests (tests/)
+# - Documentation (docs/, README.md, glossary.md)
+# - Configuration templates (.env.example)
+# - Dependency files (pyproject.toml, uv.lock)
+# - Dockerfile, docker-compose.yml
+# - Terraform configs (*.tf) but NOT *.tfvars
+# - .gitignore (this file!)
+
+# DO NOT commit:
+# - .env (has secrets!)
+# - data/ (too large, can be regenerated)
+# - Virtual environments (.venv/)
+# - Compiled files (__pycache__/)
+# - IDE settings (personal preference)
