@@ -1,0 +1,105 @@
+# pyproject.toml - Python Project Configuration
+# This file defines your project metadata and dependencies
+# It's the modern standard for Python projects (replaces requirements.txt)
+
+[project]
+# Basic project information
+name = "sg-public-transport-pipeline"
+version = "0.1.0"
+description = "End-to-end data pipeline for Singapore LTA public transport analytics"
+readme = "README.md"
+
+# Python version requirement
+# This project requires Python 3.10 or higher
+requires-python = ">=3.10"
+
+# Authors - who maintains this project
+authors = [
+    { name = "Joseph Emmanuel Remoto", email = "joseph.remoto@helloconnect.org" }
+]
+
+# Project dependencies
+# These are external libraries (packages) that our code needs to run
+# uv will install these automatically when you run: uv sync
+dependencies = [
+    # requests - Library for making HTTP API calls
+    # We use this to talk to the LTA DataMall API
+    # Handles GET/POST requests, authentication headers, timeouts, etc.
+    "requests>=2.31.0",
+    
+    # python-dotenv - Loads environment variables from .env file
+    # This keeps secrets (API keys) out of our code
+    # Usage: load_dotenv() reads .env and makes variables available via os.getenv()
+    "python-dotenv>=1.0.0",
+    
+    # pandas - Powerful data manipulation library
+    # Think of it as "Excel in code" - work with tables (DataFrames)
+    # We'll use it to read CSV files, clean data, transform before uploading
+    "pandas>=2.1.0",
+    
+    # google-cloud-storage - Official Python client for Google Cloud Storage
+    # Lets us upload/download files to/from GCS buckets
+    # We'll use this to store raw CSV files in our data lake
+    "google-cloud-storage>=2.10.0",
+    
+    # google-cloud-bigquery - Official Python client for BigQuery
+    # Allows us to create tables, run queries, load data into BigQuery
+    # Essential for our data warehouse operations
+    "google-cloud-bigquery>=3.11.0",
+]
+
+# Optional dependencies (not installed by default)
+# Install with: uv sync --extra dev
+[project.optional-dependencies]
+# Development tools - only needed during development, not in production
+dev = [
+    # pytest - Testing framework for Python
+    # Lets us write and run automated tests
+    "pytest>=7.4.0",
+    
+    # black - Code formatter (auto-formats Python code)
+    # Ensures consistent code style across the project
+    "black>=23.7.0",
+    
+    # ruff - Fast Python linter (checks code quality)
+    # Catches common errors and enforces best practices
+    "ruff>=0.0.285",
+]
+
+# Build system configuration
+# This tells tools like pip how to build/install your project
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+# Hatchling configuration
+# Tell hatchling where to find our Python packages
+[tool.hatch.build.targets.wheel]
+# Our code lives in the src/ directory
+# This is called "src layout" - a best practice for Python projects
+packages = ["src"]
+
+# Tool configurations below
+
+# Black configuration (code formatter)
+[tool.black]
+# Maximum line length before black wraps to next line
+line-length = 100
+# Python versions to target for syntax compatibility
+target-version = ["py310", "py311"]
+
+# Ruff configuration (linter)
+[tool.ruff]
+# Maximum line length (same as black for consistency)
+line-length = 100
+# Python version to lint for
+target-version = "py310"
+
+# Pytest configuration (testing framework)
+[tool.pytest.ini_options]
+# Where pytest looks for test files
+testpaths = ["tests"]
+# Naming pattern for test files
+python_files = ["test_*.py", "*_test.py"]
+# Naming pattern for test functions
+python_functions = ["test_*"]
