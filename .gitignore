@@ -1,4 +1,3 @@
-rules.md
 # .gitignore - Files and folders that Git should ignore
 # This keeps sensitive data, generated files, and local artifacts out of version control
 
