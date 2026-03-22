@@ -216,6 +216,7 @@ docs/.doctrees/
 # Keep this at the end for any custom project files you want to ignore
 rules.md                 # Your existing rule (keeping it)
 
+
 # ============================================================================
 # Important: What SHOULD be committed
 # ============================================================================
