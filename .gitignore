@@ -82,14 +82,14 @@ htmlcov/                 # HTML coverage reports
 # ============================================================================
 
 # CRITICAL: These files contain secrets and must NEVER be committed!
-.env                     # Your environment variables (API keys, passwords)
-.env.*                   # Any environment file variants (.env.local, .env.prod)
-*.env                    # Catch-all for env files
+.env
+.env.*
+*.env
 
 # Credentials & keys
-credentials/             # Folder for GCP service account keys
-*.json                   # Be careful - this ignores ALL .json files
-!pyproject.toml          # Except we want to keep pyproject.toml
+credentials/
+*.json
+!pyproject.toml
 *.pem                    # Private key files
 *.key                    # Key files
 *.crt                    # Certificate files
@@ -215,6 +215,7 @@ docs/.doctrees/
 
 # Keep this at the end for any custom project files you want to ignore
 rules.md                 # Your existing rule (keeping it)
+
 
 # ============================================================================
 # Important: What SHOULD be committed
