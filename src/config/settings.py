@@ -62,8 +62,8 @@ class Config:
     
     # Base URL for LTA DataMall API
     # This is the main endpoint that all API calls start with
-    # We hardcode this because it never changes
-    LTA_BASE_URL: str = 'http://datamall2.mytransport.sg/ltaodataservice'
+    # IMPORTANT: Must use HTTPS (not HTTP) for API to work
+    LTA_BASE_URL: str = 'https://datamall2.mytransport.sg/ltaodataservice'
     
     # API request timeout in seconds
     # How long to wait for API response before giving up
@@ -95,12 +95,11 @@ class Config:
     # GCS bucket name for storing raw data files
     # This is where we upload CSV files from LTA API
     # Must be globally unique across all of GCP
-    GCS_BUCKET_RAW: Optional[str] = os.getenv('GCS_BUCKET')
+    GCS_BUCKET_RAW: Optional[str] = os.getenv('GCS_BUCKET_RAW')
     
     # GCS bucket for processed/transformed data (optional - can use same bucket)
     # If not set, we'll use the same bucket as raw data
-    GCS_BUCKET_PROCESSED: Optional[str] = os.getenv('GCS_BUCKET_PROCESSED', 
-                                                     os.getenv('GCS_BUCKET'))
+    GCS_BUCKET_PROCESSED: Optional[str] = os.getenv('GCS_BUCKET_PROCESSED')
     
     # =========================================================================
     # BigQuery Configuration
@@ -237,7 +236,6 @@ class Config:
         uploading to GCS.
         
         Creates:
-        - data/
         - data/raw/
         - data/processed/
         - data/raw/bus/
