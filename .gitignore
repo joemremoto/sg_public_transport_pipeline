@@ -83,7 +83,6 @@ htmlcov/                 # HTML coverage reports
 
 # CRITICAL: These files contain secrets and must NEVER be committed!
 .env
-.env.*
 *.env
 
 # Credentials & keys
