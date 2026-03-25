@@ -26,26 +26,23 @@ dependencies = [
     # We use this to talk to the LTA DataMall API
     # Handles GET/POST requests, authentication headers, timeouts, etc.
     "requests>=2.31.0",
-    
     # python-dotenv - Loads environment variables from .env file
     # This keeps secrets (API keys) out of our code
     # Usage: load_dotenv() reads .env and makes variables available via os.getenv()
     "python-dotenv>=1.0.0",
-    
     # pandas - Powerful data manipulation library
     # Think of it as "Excel in code" - work with tables (DataFrames)
     # We'll use it to read CSV files, clean data, transform before uploading
     "pandas>=2.1.0",
-    
     # google-cloud-storage - Official Python client for Google Cloud Storage
     # Lets us upload/download files to/from GCS buckets
     # We'll use this to store raw CSV files in our data lake
     "google-cloud-storage>=2.10.0",
-    
     # google-cloud-bigquery - Official Python client for BigQuery
     # Allows us to create tables, run queries, load data into BigQuery
     # Essential for our data warehouse operations
     "google-cloud-bigquery>=3.11.0",
+    "xlrd>=2.0.2",
 ]
 
 # Optional dependencies (not installed by default)
