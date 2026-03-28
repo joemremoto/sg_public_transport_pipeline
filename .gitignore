@@ -179,6 +179,36 @@ temp/                    # Alternative temp directory
 .cache/                  # Cache directory
 
 # ============================================================================
+# Terraform State Files
+# ============================================================================
+
+# Terraform state (contains sensitive data and resource IDs)
+*.tfstate
+*.tfstate.*
+*.tfstate.backup
+
+# Terraform variable files (may contain secrets)
+terraform.tfvars
+*.auto.tfvars
+
+# Terraform directories
+.terraform/
+.terraform.lock.hcl
+
+# Crash log files
+crash.log
+crash.*.log
+
+# Override files (local customizations)
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# Terraform plan output
+*.tfplan
+
+# ============================================================================
 # Operating System Files
 # ============================================================================
 

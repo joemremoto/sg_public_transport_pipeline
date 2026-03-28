@@ -1,0 +1,74 @@
+# Terraform Variables - Example Configuration
+# 
+# INSTRUCTIONS:
+# 1. Copy this file to terraform.tfvars:
+#    cp terraform.tfvars.example terraform.tfvars
+# 
+# 2. Fill in your actual values
+# 
+# 3. NEVER commit terraform.tfvars to Git!
+#    (it's in .gitignore for safety)
+
+# ============================================================================
+# REQUIRED VARIABLES - Must be customized
+# ============================================================================
+
+# Your GCP Project ID
+# Find it at: https://console.cloud.google.com/home/dashboard
+project_id = "sg-public-transport-pipeline"
+
+# Your email address (for BigQuery admin access)
+# Use the email you log into GCP with
+bq_admin_email = "your.email@example.com"
+
+# ============================================================================
+# OPTIONAL VARIABLES - Can use defaults or customize
+# ============================================================================
+
+# GCP Region (default: asia-east1)
+# Options for Singapore:
+#   - asia-southeast1 (Singapore - lowest latency, highest cost)
+#   - asia-east1 (Taiwan - good balance)
+#   - asia-east2 (Hong Kong)
+# region = "asia-east1"
+
+# GCS Bucket Names (must be globally unique!)
+# If defaults are taken, add your initials or random string
+# gcs_bucket_raw = "sg-public-transport-data-raw-xyz123"
+# gcs_bucket_processed = "sg-public-transport-data-processed-xyz123"
+
+# BigQuery Dataset Name
+# bq_dataset = "sg_public_transport_analytics"
+
+# Service Account Name
+# service_account_name = "sg-transport-pipeline"
+
+# Environment (dev, staging, prod)
+# environment = "dev"
+
+# Safety: Allow Terraform to delete resources with data
+# Set to false for production!
+# enable_deletion = true
+
+# ============================================================================
+# DATA RETENTION - Customize for your needs
+# ============================================================================
+
+# How long to keep raw data (days)
+# raw_data_retention_days = 90
+
+# How long to keep processed data (days)
+# processed_data_retention_days = 180
+
+# How long to keep BigQuery partitions (days)
+# bq_partition_retention_days = 180
+
+# ============================================================================
+# COST OPTIMIZATION - Customize for your access patterns
+# ============================================================================
+
+# Move to NEARLINE storage after N days (cheaper for infrequent access)
+# move_to_nearline_days = 30
+
+# Move to COLDLINE storage after N days (cheapest for rare access)
+# move_to_coldline_days = 60
