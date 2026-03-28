@@ -6,11 +6,27 @@ Based on our extensive brainstorming session, here are the extracted rules and c
 
 ## Project Context
 
-**Project Name:** Singapore Public Transport Demand Analysis Pipeline  
+**Project Name:** Singapore Public Transport Analytics Pipeline  
 **Data Source:** Singapore Land Transport Authority (LTA) DataMall API  
-**Objective:** Build end-to-end data pipeline for analyzing bus and train passenger demand patterns  
-**Experience Level:** Beginner-friendly - First data pipeline project, no prior Python knowledge assumed  
-**API Documentation:** LTA_DataMall_API_User_Guide.pdf (reference for all API endpoints and specifications)
+**Objective:** End-to-end data pipeline analyzing bus and train passenger demand patterns  
+**Experience Level:** Learning by doing - Detailed comments for all Python code  
+**API Documentation:** LTA_DataMall_API_User_Guide.pdf
+
+**Current Status (as of 2026-03-25):**
+- ✅ Phase 1: Data Extraction - COMPLETE
+  - 4 extraction scripts created and tested
+  - Raw data extracted (Jan 2026): bus stops, train stations, bus OD, train OD
+  - Total data: ~175 MB (5.2k bus stops, 166 stations, 6M+ journey records)
+- ✅ Phase 2: Infrastructure Setup - COMPLETE
+  - Terraform configuration complete (GCS buckets, BigQuery dataset, service account)
+  - gcloud CLI installed and authenticated
+  - Infrastructure provisioned successfully
+  - Service account credentials extracted
+- ⏳ Phase 3: Data Upload - NEXT
+- ⏳ Phase 4: BigQuery Schema & Load - PENDING
+- ⏳ Phase 5: Transformation (dbt) - PENDING
+- ⏳ Phase 6: Orchestration (Airflow) - PENDING
+- ⏳ Phase 7: Visualization (Streamlit) - PENDING
 
 ---
 
@@ -557,47 +573,47 @@ terraform destroy
 ```
 project/
 ├── docs/
-│   ├── 1-project-brainstorming.md
-│   ├── 2-problem-statement.md
-│   ├── 3-data-architecture.md
-│   ├── 4-api-investigation.md
-│   ├── 5-technical-decisions.md
-│   └── LTA_DataMall_API_User_Guide.pdf  # Official API documentation
-├── .cursor/
-│   └── rules/
-│       └── singapore-lta-project.cursorrules
-├── terraform/              # Infrastructure as Code
-│   ├── main.tf            # Main resource definitions
-│   ├── variables.tf       # Input variables
-│   ├── outputs.tf         # Output values
-│   └── terraform.tfvars   # Variable values (gitignored)
-├── docker/                # Docker configurations
-│   ├── airflow/
-│   │   └── Dockerfile
-│   ├── ingestion/
-│   │   └── Dockerfile
-│   └── streamlit/
-│       └── Dockerfile
-├── docker-compose.yml     # Multi-container orchestration
-├── airflow/
-│   ├── dags/              # Airflow workflow definitions
-│   ├── plugins/           # Custom Airflow plugins
-│   └── logs/              # Airflow logs
-├── src/                   # Python source code
-│   ├── ingestion/         # API data extraction scripts
-│   ├── utils/             # Helper functions
-│   └── streamlit/         # Streamlit dashboard
-├── dbt/                   # dbt transformation project
-│   ├── models/
-│   │   ├── staging/       # Raw data cleaning
-│   │   ├── intermediate/  # Business logic
-│   │   └── marts/         # Final fact/dim tables
-│   ├── tests/             # Data quality tests
-│   └── dbt_project.yml
-├── .env                   # Environment variables (gitignored)
-├── .gitignore
-├── pyproject.toml         # Python dependencies (uv format)
-├── uv.lock                # Locked dependency versions
+│   ├── glossary.md                        # Technical terms and concepts
+│   ├── setup-log.md                       # Session 1: Foundation setup
+│   ├── data-extraction-checkpoint.md      # Session 2: Data extraction
+│   └── LTA_DataMall_API_User_Guide.pdf
+├── .cursor/rules/
+│   └── singapore-lta-project.cursorrules
+├── terraform/                             # Infrastructure as Code
+│   ├── main.tf                           # GCS buckets, BigQuery, IAM
+│   ├── variables.tf                      # Input variables
+│   ├── outputs.tf                        # Output values
+│   ├── terraform.tfvars.example          # Template
+│   ├── terraform.tfvars                  # Actual values (git-ignored)
+│   └── README.md                         # Terraform usage guide
+├── src/                                  # Python source code
+│   ├── config/
+│   │   ├── __init__.py
+│   │   └── settings.py                   # Centralized configuration
+│   ├── ingestion/                        # Data extraction scripts
+│   │   ├── __init__.py
+│   │   ├── lta_client.py                # API client
+│   │   ├── extract_bus_stops.py         # Bus stops dimension
+│   │   ├── extract_train_stations.py    # Train stations dimension
+│   │   ├── extract_bus_od.py            # Bus journey facts
+│   │   └── extract_train_od.py          # Train journey facts
+│   ├── upload/                           # GCS upload (pending)
+│   └── load/                             # BigQuery load (pending)
+├── tests/
+│   └── test_api_connection.py           # API endpoint validation
+├── data/                                 # Local data (git-ignored)
+│   ├── raw/
+│   │   ├── bus_stops.json               # 5,202 stops
+│   │   ├── train_stations.json          # 166 stations
+│   │   ├── bus_od_202601.csv           # 5.9M records
+│   │   └── train_od_202601.csv         # 884k records
+│   └── processed/
+├── credentials/                          # Service account keys (git-ignored)
+│   └── gcp-service-account.json
+├── .env                                 # Environment variables (git-ignored)
+├── .gitignore                           # Comprehensive ignore rules
+├── pyproject.toml                       # Python dependencies (uv)
+├── uv.lock                              # Locked versions
 └── README.md
 ```
 
@@ -702,63 +718,73 @@ Think of it like a factory assembly line for data:
 
 ## Important Context Notes
 
-1. **Singapore-Specific:** This is Singapore LTA data, not London TfL (we pivoted from TfL due to data accessibility issues)
-2. **Monthly Updates:** Pipeline runs monthly when new data becomes available (by 10th of each month)
-3. **Historical Window:** API provides up to 3 months of historical data; longer history requires saving monthly
-4. **No Manual Steps:** Entire pipeline must be automated (no manual CSV downloads)
-5. **Production-Grade:** Demonstrate industry best practices, not quick scripts
-6. **Docker Everything:** All components (Airflow, Python scripts, Streamlit) run in Docker containers
-7. **Beginner-Friendly:** Assume no prior Python knowledge - document everything extensively
-8. **Use uv:** Always use uv for Python package management (not pip)
-9. **Terraform First:** Provision all cloud infrastructure with Terraform before deploying code
-10. **API Documentation:** Always refer to LTA_DataMall_API_User_Guide.pdf for endpoint specifications
+1. **Singapore LTA Data** - Not London TfL (pivoted due to data accessibility)
+2. **Monthly Updates** - Pipeline runs monthly when new data available (by 10th)
+3. **Historical Window** - API provides 3 months history; must save monthly for longer retention
+4. **Fully Automated** - No manual CSV downloads
+5. **Production-Grade** - Industry best practices demonstrated
+6. **Package Management** - Use `uv` exclusively (not pip)
+7. **Terraform First** - Provision all cloud infrastructure before deploying code
+8. **API Documentation** - Refer to LTA_DataMall_API_User_Guide.pdf for specifications
+9. **Data Already Extracted** - January 2026 data already downloaded locally
+10. **Infrastructure Ready** - Terraform configs created, ready for `terraform apply`
+11. **GCP Project** - Using `sg-public-transport-pipeline`
+12. **User Runs Commands** - Assistant suggests, user executes all terminal commands
+
+**Current .env Configuration:**
+```
+LTA_ACCOUNT_KEY=<key>
+GOOGLE_APPLICATION_CREDENTIALS=./credentials/gcp-service-account.json
+GCP_PROJECT_ID=sg-public-transport-pipeline
+GCS_BUCKET_RAW=sg-public-transport-data-raw
+GCS_BUCKET_PROCESSED=sg-public-transport-data-processed
+BQ_DATASET=sg_public_transport_analytics
+GCP_REGION=asia-east1
+```
+
+**Provisioned GCP Resources:**
+- GCS Bucket: `sg-public-transport-data-raw` (with lifecycle rules)
+- GCS Bucket: `sg-public-transport-data-processed` (with lifecycle rules)
+- BigQuery Dataset: `sg_public_transport_analytics` (asia-east1)
+- Service Account: `sg-transport-pipeline-v2@sg-public-transport-pipeline.iam.gserviceaccount.com`
+
+**Installed Tools:**
+- Python 3.10+ with uv package manager
+- Terraform (via Scoop)
+- gcloud CLI (authenticated with service account)
+- Git
 
 ---
 
 ## AI Assistant Guidelines
 
-### Development Workflow for Beginners:
+### Communication Style:
+**NO FLUFF - Direct and Concise**
+- Get straight to the point
+- No unnecessary praise or validation ("Great question!", "Excellent!")
+- No emoji usage unless explicitly requested by user
+- Focus on facts, technical accuracy, and actionable information
+- Brief explanations unless detail is requested
+- Avoid superlatives and excessive enthusiasm
 
-**CRITICAL: ONE FILE AT A TIME**
-- Create or modify only ONE file per interaction
-- Give the user time to read, understand, and absorb the code
-- Wait for user confirmation before proceeding to the next file
-- This allows the beginner to learn progressively without feeling overwhelmed
+### Development Workflow:
 
-**Incremental Development:**
-1. Create one script/config file
-2. Explain what it does and how it works
-3. Wait for user feedback/questions
-4. Only then proceed to the next file
+**User Runs Commands**
+- User executes all terminal commands themselves
+- Assistant suggests commands but does not run them
+- User shares results when needed for debugging or next steps
+- Assistant provides command explanations when asked
 
-**When Suggesting Next Steps:**
-- Always ask: "Would you like me to create [next file name] next?"
-- Don't assume the user wants to move forward immediately
-- Be patient and let the learning happen at the user's pace
+**File Creation**
+- Create multiple files when they form a logical unit (e.g., Terraform config set)
+- Provide context for what each file does
+- Focus on working code over step-by-step hand-holding
 
-**Example Good Flow:**
-```
-✅ Step 1: Create .gitignore file
-   - Explain what .gitignore does
-   - Wait for user acknowledgment
-   
-✅ Step 2: Create pyproject.toml
-   - Explain Python dependency management
-   - Wait for user to ask questions
-   
-✅ Step 3: Create Dockerfile
-   - Explain Docker concepts
-   - Wait before continuing
-```
-
-**Example Bad Flow:**
-```
-❌ Create 10 files at once (overwhelming!)
-❌ Assume user is ready to move forward
-❌ Skip explanations to go faster
-```
-
-**Remember:** The goal is learning, not speed. Quality understanding > quantity of code.
+**Code Quality**
+- Always read files before editing (use Read tool)
+- Check for linter errors after substantial edits (ReadLints tool)
+- Never add obvious, redundant comments
+- Assume user will ask questions if something is unclear
 
 ---
 

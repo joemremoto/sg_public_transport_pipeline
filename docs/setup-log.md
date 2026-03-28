@@ -407,5 +407,341 @@ Building a data pipeline isn't just about writing code - it's about:
 
 ---
 
-**Last updated**: March 21, 2026  
-**Next session**: TBD - Data extraction scripts
+**Last updated**: March 25, 2026  
+**Next session**: Session 3 completed - Infrastructure setup with Terraform
+
+---
+
+## Session 3: Infrastructure Setup with Terraform (March 25, 2026)
+
+### 🎯 Goals
+- Install and configure Terraform
+- Install and authenticate gcloud CLI
+- Create Terraform configuration for GCP infrastructure
+- Provision cloud resources (GCS buckets, BigQuery dataset, service account)
+
+---
+
+### ✅ What We Built
+
+#### 1. Terraform Configuration Files
+
+**Created 5 Terraform files in `terraform/` folder:**
+
+**`main.tf` (347 lines)**
+- Terraform and provider configuration
+- 2 GCS buckets (raw and processed data)
+- 1 BigQuery dataset for analytics
+- 1 Service account for pipeline authentication
+- IAM permissions for service account
+- Service account key generation
+- Enabled required APIs (Storage, BigQuery, IAM)
+- Lifecycle rules for cost optimization
+- Labels for organization
+
+**`variables.tf` (262 lines)**
+- Variable declarations with types and descriptions
+- Default values for optional parameters
+- Validation rules (bucket name format, environment values, etc.)
+- Configuration for:
+  - Project ID (required)
+  - Region (default: asia-east1)
+  - Bucket names
+  - BigQuery dataset name
+  - Service account name
+  - Data retention periods
+  - Cost optimization settings
+
+**`outputs.tf` (199 lines)**
+- Resource names and IDs
+- Console URLs for easy access
+- Service account credentials (sensitive)
+- Infrastructure summary
+- Next steps instructions
+
+**`terraform.tfvars.example` (75 lines)**
+- Template for user configuration
+- Comments explaining each variable
+- Example values
+
+**`README.md` (398 lines)**
+- Complete usage guide
+- Prerequisites and installation instructions
+- Step-by-step workflow
+- Common commands reference
+- Troubleshooting section
+
+#### 2. GCP Resources Provisioned
+
+**Successfully created:**
+- **GCS Bucket (Raw):** `sg-public-transport-data-raw`
+  - Location: asia-east1
+  - Storage class: STANDARD
+  - Lifecycle: Move to NEARLINE after 30 days, delete after 90 days
+  - Versioning enabled
+  
+- **GCS Bucket (Processed):** `sg-public-transport-data-processed`
+  - Location: asia-east1
+  - Storage class: STANDARD
+  - Lifecycle: Move to COLDLINE after 60 days, delete after 180 days
+  - Versioning enabled
+
+- **BigQuery Dataset:** `sg_public_transport_analytics`
+  - Location: asia-east1
+  - Default partition expiration: 180 days
+  - Ready for fact and dimension tables
+
+- **Service Account:** `sg-transport-pipeline-v2`
+  - IAM roles:
+    - Storage Object Admin (both buckets)
+    - BigQuery Admin (project-level)
+    - BigQuery Data Editor (dataset-level)
+  - JSON key extracted and saved
+
+#### 3. Updated `.gitignore`
+
+Added comprehensive Terraform ignore rules:
+- `*.tfstate` - State files (contain sensitive data)
+- `terraform.tfvars` - Actual values (may contain secrets)
+- `.terraform/` - Terraform working directory
+- `*.tfplan` - Plan output files
+
+---
+
+### 🐛 Issues Encountered & Fixed
+
+#### Issue 1: Invalid `self` Reference in outputs.tf
+
+**Problem:**
+```hcl
+- BigQuery Console: ${self.value.bigquery_dataset_url}
+```
+Error: The "self" object is not available in output blocks
+
+**Solution:** Replaced with direct variable/resource references:
+```hcl
+- BigQuery Console: https://console.cloud.google.com/bigquery?project=${var.project_id}&...
+```
+
+**Lesson:** `self` only works in resource provisioner blocks, not outputs
+
+---
+
+#### Issue 2: BigQuery Dataset Name Validation
+
+**Problem:**
+```
+Dataset name must be alphanumeric and underscores only.
+```
+Used hyphens in dataset name: `sg-public-transport-analytics`
+
+**Solution:** Changed to underscores in `.env` and `terraform.tfvars`:
+```hcl
+bq_dataset = "sg_public_transport_analytics"
+```
+
+**Lesson:** BigQuery has different naming rules than GCS (GCS allows hyphens, BigQuery doesn't)
+
+---
+
+#### Issue 3: Service Account Already Exists
+
+**Problem:**
+```
+Error: Service account sg-lta-pipeline-sa already exists
+```
+Manually created service account before Terraform
+
+**Solution:** Changed service account name in `terraform.tfvars`:
+```hcl
+service_account_name = "sg-transport-pipeline-v2"
+```
+
+**Result:** Terraform created new service account, extracted new credentials
+
+**Lesson:** Terraform manages resources it creates; existing resources cause conflicts unless imported
+
+---
+
+#### Issue 4: Extracting Service Account Key (Windows)
+
+**Problem:** Base64 decoding failed in Git Bash and PowerShell:
+```bash
+base64: invalid input  # Git Bash
+Exception: FormatException  # PowerShell
+```
+
+**Solution:** Created Python helper script `terraform/extract_key.py`:
+```python
+import subprocess
+import base64
+
+result = subprocess.run(["terraform", "output", "-raw", "service_account_key_json"], ...)
+key_json = base64.b64decode(result.stdout).decode('utf-8')
+# Save to file
+```
+
+**Lesson:** Windows has different base64 tools; Python is more portable
+
+---
+
+#### Issue 5: gcloud CLI Python Version Mismatch
+
+**Problem:**
+```
+WARNING: Python 3.9.x is no longer officially supported
+module 'OpenSSL.crypto' has no attribute 'sign'
+```
+gcloud bundled with Python 3.9, system has Python 3.10
+
+**Solution (pending):** Set environment variable to use system Python:
+```powershell
+$env:CLOUDSDK_PYTHON = "C:\Users\...\Python310\python.exe"
+```
+
+**Lesson:** gcloud has bundled Python; can override with CLOUDSDK_PYTHON
+
+---
+
+### 🎓 Key Concepts Learned
+
+#### Terraform Fundamentals
+- **Infrastructure as Code (IaC)** - Define infrastructure in text files
+- **Declarative syntax** - Describe desired state, Terraform figures out how
+- **State management** - Terraform tracks what it created in `.tfstate` files
+- **Variables system**:
+  - `variables.tf` - Declarations (what inputs exist)
+  - `terraform.tfvars` - Values (your actual config)
+  - `main.tf` - Usage (how to use variables)
+- **Outputs** - Display important info after apply
+- **Providers** - Plugins that talk to cloud platforms (Google, AWS, etc.)
+
+#### Terraform vs .env
+- **Terraform (.tfvars)** - Build-time config (creates infrastructure)
+- **Python (.env)** - Runtime config (uses infrastructure)
+- Must keep values in sync manually
+- Example: Terraform creates bucket "xyz", .env must reference same "xyz"
+
+#### GCP Resource Naming
+- **GCS buckets** - Must be globally unique, lowercase, hyphens allowed
+- **BigQuery datasets** - Project-unique, underscores allowed, NO hyphens
+- **Service accounts** - Project-unique, 6-30 chars, lowercase with hyphens
+
+#### Cost Optimization Strategies
+- **Storage classes** - STANDARD → NEARLINE → COLDLINE (cheaper but slower access)
+- **Lifecycle rules** - Automatically move/delete old data
+- **Partition expiration** - Auto-delete old BigQuery partitions
+- **Versioning** - Protect against accidental deletion (costs extra storage)
+
+#### IAM Best Practices
+- **Service accounts** - For applications (not personal accounts)
+- **Least privilege** - Grant minimum permissions needed
+- **Scope permissions** - Bucket-level vs project-level
+- **Separate accounts** - Different SA for dev/staging/prod
+
+---
+
+### 📊 Current Status
+
+✅ **Completed:**
+1. Terraform installed (via Scoop)
+2. gcloud CLI installed and authenticated
+3. Terraform configuration written (5 files)
+4. GCP project selected: `sg-public-transport-pipeline`
+5. Infrastructure provisioned:
+   - 2 GCS buckets
+   - 1 BigQuery dataset
+   - 1 service account with permissions
+6. Service account credentials extracted
+7. `.env` values aligned with Terraform outputs
+
+**Infrastructure Summary:**
+```yaml
+Project: sg-public-transport-pipeline
+Region: asia-east1
+
+Storage:
+  - sg-public-transport-data-raw (raw data)
+  - sg-public-transport-data-processed (transformed data)
+
+BigQuery:
+  - sg_public_transport_analytics (analytics tables)
+
+Service Account:
+  - sg-transport-pipeline-v2@sg-public-transport-pipeline.iam.gserviceaccount.com
+```
+
+---
+
+### 🚀 Next Steps
+
+Now that infrastructure exists, we can:
+
+1. **Test access** - Verify service account can access GCS and BigQuery
+2. **Upload data** - Create scripts to upload local data to GCS
+3. **Load to BigQuery** - Create scripts to load from GCS to BigQuery tables
+4. **Define schema** - Design BigQuery table schemas (fact and dimension tables)
+5. **dbt project** - Set up transformation layer
+
+---
+
+### 💡 Reflections
+
+**What went well:**
+- Terraform abstracts away cloud console clicking
+- Infrastructure changes are version-controlled and reviewable
+- Outputs provide clear next steps
+- Validation rules catch mistakes early
+- Comprehensive documentation (README) makes it easy to remember commands
+
+**What was challenging:**
+- Windows-specific issues (base64 decoding, gcloud Python version)
+- Understanding Terraform's three-file system (variables.tf, main.tf, tfvars)
+- Keeping .env and terraform.tfvars in sync manually
+- GCS vs BigQuery naming differences
+- Service account conflicts from manual pre-creation
+
+**Key insight:**
+Terraform brings software engineering practices to infrastructure:
+1. **Version control** - Track changes over time
+2. **Code review** - Review infra changes before applying
+3. **Documentation** - Code is self-documenting
+4. **Reproducibility** - Same code = same infrastructure
+5. **Collaboration** - Team can share configurations
+
+But it requires thinking differently:
+- Declarative (what you want) vs imperative (step-by-step)
+- State management (Terraform needs to know what exists)
+- Plan before apply (always preview changes)
+
+---
+
+### 📚 Resources That Helped
+
+- [Terraform Documentation](https://www.terraform.io/docs)
+- [Google Provider Docs](https://registry.terraform.io/providers/hashicorp/google/latest/docs)
+- [GCS Lifecycle Management](https://cloud.google.com/storage/docs/lifecycle)
+- [BigQuery Datasets](https://cloud.google.com/bigquery/docs/datasets)
+- [IAM Service Accounts](https://cloud.google.com/iam/docs/service-accounts)
+
+---
+
+### 📝 Notes for Next Session
+
+**Before starting next session:**
+- [ ] Test service account credentials work
+- [ ] Verify GCS bucket access: `gcloud storage ls gs://sg-public-transport-data-raw`
+- [ ] Check BigQuery dataset exists in console
+- [ ] Review Python google-cloud-storage library docs
+- [ ] Think about GCS folder structure (year/month/mode)
+
+**Questions to consider:**
+- How to organize data in GCS? (flat vs hierarchical folders)
+- Should we upload JSON as-is or convert to Parquet first?
+- How to handle file versioning in GCS?
+- Should BigQuery load be automatic (external tables) or manual (load jobs)?
+
+---
+
+**Last updated**: March 25, 2026  
+**Next session**: Data Upload - Move local data to GCS, load to BigQuery
