@@ -12,7 +12,7 @@ Based on our extensive brainstorming session, here are the extracted rules and c
 **Experience Level:** Learning by doing - Detailed comments for all Python code  
 **API Documentation:** LTA_DataMall_API_User_Guide.pdf
 
-**Current Status (as of 2026-03-25):**
+**Current Status (as of 2026-03-28):**
 - ✅ Phase 1: Data Extraction - COMPLETE
   - 4 extraction scripts created and tested
   - Raw data extracted (Jan 2026): bus stops, train stations, bus OD, train OD
@@ -22,8 +22,11 @@ Based on our extensive brainstorming session, here are the extracted rules and c
   - gcloud CLI installed and authenticated
   - Infrastructure provisioned successfully
   - Service account credentials extracted
-- ⏳ Phase 3: Data Upload - NEXT
-- ⏳ Phase 4: BigQuery Schema & Load - PENDING
+- 🔄 Phase 3: Data Upload - IN PROGRESS
+  - GCS uploader module created (src/upload/gcs_uploader.py)
+  - Upload script with CLI created (scripts/upload_to_gcs.py)
+  - Ready for testing: uv run python scripts/upload_to_gcs.py --all
+- ⏳ Phase 4: BigQuery Schema & Load - NEXT
 - ⏳ Phase 5: Transformation (dbt) - PENDING
 - ⏳ Phase 6: Orchestration (Airflow) - PENDING
 - ⏳ Phase 7: Visualization (Streamlit) - PENDING
