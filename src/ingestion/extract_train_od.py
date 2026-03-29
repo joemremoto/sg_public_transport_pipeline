@@ -34,8 +34,8 @@ USAGE:
     uv run python src/ingestion/extract_train_od.py
 
 OUTPUT:
-    Creates: data/raw/train_od_YYYYMM.csv
-    Example: data/raw/train_od_202601.csv (January 2026 data)
+    Creates: data/raw/train/train_od_YYYYMM.csv
+    Example: data/raw/train/train_od_202601.csv (January 2026 data)
 """
 
 # ============================================================================
@@ -343,10 +343,14 @@ def main():
         
         # STEP 2: Download and extract
         logger.info("Step 2: Downloading and extracting data...")
+        # Save to mode-specific subdirectory (data/raw/train/)
+        output_dir = Config.RAW_DATA_DIR / 'train'
+        output_dir.mkdir(parents=True, exist_ok=True)
+        
         output_path = download_and_extract_od_data(
             year=year,
             month=month,
-            output_dir=Config.RAW_DATA_DIR
+            output_dir=output_dir
         )
         
         # STEP 3: Print summary
