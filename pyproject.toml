@@ -47,6 +47,8 @@ dependencies = [
     # Provides utilities for working with dates (relativedelta for month arithmetic)
     # We use this to generate date ranges for loading historical data
     "python-dateutil>=2.8.0",
+    "dbt-core>=1.11.7",
+    "dbt-bigquery>=1.11.1",
 ]
 
 # Optional dependencies (not installed by default)

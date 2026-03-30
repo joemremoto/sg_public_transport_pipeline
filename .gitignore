@@ -266,3 +266,19 @@ docs/.doctrees/
 # - Virtual environments (.venv/)
 # - Compiled files (__pycache__/)
 # - IDE settings (personal preference)
+
+# ============================================================================
+# dbt (Data Build Tool) 
+# ============================================================================
+
+# dbt artifacts (generated during runs)
+sg_transport_dbt/target/          # Compiled SQL and run artifacts
+sg_transport_dbt/dbt_packages/    # Installed dbt packages
+sg_transport_dbt/logs/            # dbt execution logs
+
+# dbt user-specific settings
+sg_transport_dbt/.user.yml        # User-specific dbt settings
+
+# profiles.yml typically lives in ~/.dbt/ (not in project)
+# But if someone puts it in project, ignore it (contains credentials!)
+sg_transport_dbt/profiles.yml
