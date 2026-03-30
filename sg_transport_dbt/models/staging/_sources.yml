@@ -1,0 +1,86 @@
+version: 2
+
+sources:
+  - name: raw
+    description: >
+      Raw tables loaded from GCS into BigQuery.
+      These tables contain unprocessed data directly from LTA DataMall API.
+      Source of truth: GCS bucket (sg-public-transport-data-raw)
+    
+    database: sg-public-transport-pipeline
+    schema: sg_public_transport_analytics
+    
+    tables:
+      - name: bus_stops
+        description: >
+          Bus stop reference data from LTA DataMall API.
+          Contains location and descriptive information for all bus stops in Singapore.
+          Updated: Ad-hoc (infrequent)
+        columns:
+          - name: BusStopCode
+            description: Unique 5-digit bus stop identifier
+          - name: RoadName
+            description: Name of road where bus stop is located
+          - name: Description
+            description: Human-readable description (usually nearby landmark)
+          - name: Latitude
+            description: Geographic latitude coordinate
+          - name: Longitude
+            description: Geographic longitude coordinate
+      
+      - name: train_stations
+        description: >
+          Train station reference data from LTA DataMall.
+          Contains information for all MRT/LRT stations in Singapore.
+          Updated: Ad-hoc (when new stations open)
+        columns:
+          - name: stn_code
+            description: Station code (e.g., NS1, EW12)
+          - name: mrt_station_english
+            description: Official English station name
+          - name: mrt_station_chinese
+            description: Chinese station name
+          - name: mrt_line_english
+            description: MRT/LRT line name (e.g., North South Line)
+      
+      - name: bus_od
+        description: >
+          Bus origin-destination journey data.
+          Aggregated passenger trip counts between bus stops by hour and day type.
+          Updated: Monthly (around 10th of following month)
+        columns:
+          - name: YEAR_MONTH
+            description: Period in YYYYMM format (e.g., 202601)
+          - name: DAY_TYPE
+            description: WEEKDAY or WEEKENDS/HOLIDAY
+          - name: TIME_PER_HOUR
+            description: Hour of day (0-23)
+          - name: PT_TYPE
+            description: Public transport type (BUS)
+          - name: ORIGIN_PT_CODE
+            description: Origin bus stop code
+          - name: DESTINATION_PT_CODE
+            description: Destination bus stop code
+          - name: TOTAL_TRIPS
+            description: Aggregate trip count
+      
+      - name: train_od
+        description: >
+          Train origin-destination journey data.
+          Aggregated passenger trip counts between train stations by hour and day type.
+          Updated: Monthly (around 10th of following month)
+        columns:
+          - name: YEAR_MONTH
+            description: Period in YYYYMM format (e.g., 202601)
+          - name: DAY_TYPE
+            description: WEEKDAY or WEEKENDS/HOLIDAY
+          - name: TIME_PER_HOUR
+            description: Hour of day (0-23)
+          - name: PT_TYPE
+            description: Public transport type (TRAIN)
+          - name: ORIGIN_PT_CODE
+            description: Origin station code
+          - name: DESTINATION_PT_CODE
+            description: Destination station code
+          - name: TOTAL_TRIPS
+            description: Aggregate trip count

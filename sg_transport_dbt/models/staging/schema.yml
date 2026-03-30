@@ -1,0 +1,155 @@
+version: 2
+
+models:
+  - name: stg_bus_stops
+    description: >
+      Cleaned and standardized bus stop reference data.
+      One row per bus stop with consistent naming and data types.
+    columns:
+      - name: bus_stop_code
+        description: Unique 5-digit bus stop identifier (natural key)
+        tests:
+          - unique
+          - not_null
+      
+      - name: road_name
+        description: Name of road where bus stop is located
+      
+      - name: description
+        description: Human-readable description (landmark/location)
+      
+      - name: latitude
+        description: Geographic latitude coordinate
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 1.15  # Singapore's southernmost point
+              max_value: 1.48  # Singapore's northernmost point
+      
+      - name: longitude
+        description: Geographic longitude coordinate
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 103.6  # Singapore's westernmost point
+              max_value: 104.1  # Singapore's easternmost point
+
+  - name: stg_train_stations
+    description: >
+      Cleaned and standardized train station reference data.
+      One row per train station with consistent naming.
+    columns:
+      - name: station_code
+        description: Station code (e.g., NS1, EW12) - natural key
+        tests:
+          - unique
+          - not_null
+      
+      - name: station_name
+        description: Official English station name
+        tests:
+          - not_null
+      
+      - name: station_name_chinese
+        description: Chinese station name
+      
+      - name: line_name
+        description: MRT/LRT line name
+        tests:
+          - not_null
+
+  - name: stg_bus_od
+    description: >
+      Cleaned bus origin-destination journey data.
+      Aggregated trip counts between bus stops by hour and day type.
+    columns:
+      - name: year_month
+        description: Period in YYYYMM format (e.g., 202601)
+        tests:
+          - not_null
+      
+      - name: day_type
+        description: Type of day
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['WEEKDAY', 'WEEKENDS/HOLIDAY']
+      
+      - name: hour
+        description: Hour of day when journey started (0-23)
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 0
+              max_value: 23
+      
+      - name: origin_bus_stop_code
+        description: Origin bus stop code
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_bus_stops')
+              field: bus_stop_code
+      
+      - name: destination_bus_stop_code
+        description: Destination bus stop code
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_bus_stops')
+              field: bus_stop_code
+      
+      - name: trip_count
+        description: Aggregate trip count
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 1  # We filter out zero trips in staging
+
+  - name: stg_train_od
+    description: >
+      Cleaned train origin-destination journey data.
+      Aggregated trip counts between train stations by hour and day type.
+    columns:
+      - name: year_month
+        description: Period in YYYYMM format (e.g., 202601)
+        tests:
+          - not_null
+      
+      - name: day_type
+        description: Type of day
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['WEEKDAY', 'WEEKENDS/HOLIDAY']
+      
+      - name: hour
+        description: Hour of day when journey started (0-23)
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 0
+              max_value: 23
+      
+      - name: origin_station_code
+        description: Origin train station code
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_train_stations')
+              field: station_code
+      
+      - name: destination_station_code
+        description: Destination train station code
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_train_stations')
+              field: station_code
+      
+      - name: trip_count
+        description: Aggregate trip count
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 1  # We filter out zero trips in staging
