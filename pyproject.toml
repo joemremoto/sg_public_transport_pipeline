@@ -43,6 +43,10 @@ dependencies = [
     # Essential for our data warehouse operations
     "google-cloud-bigquery>=3.11.0",
     "xlrd>=2.0.2",
+    # python-dateutil - Extensions to Python's datetime module
+    # Provides utilities for working with dates (relativedelta for month arithmetic)
+    # We use this to generate date ranges for loading historical data
+    "python-dateutil>=2.8.0",
 ]
 
 # Optional dependencies (not installed by default)

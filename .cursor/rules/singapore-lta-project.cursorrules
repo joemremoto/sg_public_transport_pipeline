@@ -12,7 +12,7 @@ Based on our extensive brainstorming session, here are the extracted rules and c
 **Experience Level:** Learning by doing - Detailed comments for all Python code  
 **API Documentation:** LTA_DataMall_API_User_Guide.pdf
 
-**Current Status (as of 2026-03-28):**
+**Current Status (as of 2026-03-30):**
 - ✅ Phase 1: Data Extraction - COMPLETE
   - 4 extraction scripts created and tested
   - Raw data extracted (Jan 2026): bus stops, train stations, bus OD, train OD
@@ -22,12 +22,19 @@ Based on our extensive brainstorming session, here are the extracted rules and c
   - gcloud CLI installed and authenticated
   - Infrastructure provisioned successfully
   - Service account credentials extracted
-- 🔄 Phase 3: Data Upload - IN PROGRESS
+- ✅ Phase 3: Data Upload - COMPLETE
   - GCS uploader module created (src/upload/gcs_uploader.py)
   - Upload script with CLI created (scripts/upload_to_gcs.py)
-  - Ready for testing: uv run python scripts/upload_to_gcs.py --all
-- ⏳ Phase 4: BigQuery Schema & Load - NEXT
-- ⏳ Phase 5: Transformation (dbt) - PENDING
+  - JSON→NDJSON conversion implemented for reference data
+  - All data uploaded to GCS with proper partitioning
+- ✅ Phase 4: BigQuery Schema & Load - COMPLETE
+  - Schema definitions created (src/load/bq_schemas.py)
+  - BigQuery loader module created (src/load/bq_loader.py)
+  - CLI script created (scripts/load_to_bq.py)
+  - 4 tables loaded: bus_stops (5.2k), train_stations (166), bus_od (5.9M), train_od (884k)
+  - Total: 6.8M+ records in BigQuery
+  - Architecture: Local → GCS → BigQuery (proper data flow)
+- ⏳ Phase 5: Transformation (dbt) - NEXT
 - ⏳ Phase 6: Orchestration (Airflow) - PENDING
 - ⏳ Phase 7: Visualization (Streamlit) - PENDING
 
@@ -600,16 +607,31 @@ project/
 │   │   ├── extract_train_stations.py    # Train stations dimension
 │   │   ├── extract_bus_od.py            # Bus journey facts
 │   │   └── extract_train_od.py          # Train journey facts
-│   ├── upload/                           # GCS upload (pending)
-│   └── load/                             # BigQuery load (pending)
+│   ├── upload/                           # GCS upload
+│   │   ├── __init__.py
+│   │   └── gcs_uploader.py              # Upload with NDJSON conversion
+│   └── load/                             # BigQuery load
+│       ├── __init__.py
+│       ├── bq_schemas.py                # Table schema definitions
+│       └── bq_loader.py                 # BigQuery loader
+├── scripts/
+│   ├── upload_to_gcs.py                 # CLI for GCS upload
+│   └── load_to_bq.py                    # CLI for BigQuery load
 ├── tests/
-│   └── test_api_connection.py           # API endpoint validation
+│   ├── test_api_connection.py           # API endpoint validation
+│   └── test_data_organization.py        # Data file organization validation
 ├── data/                                 # Local data (git-ignored)
 │   ├── raw/
+│   │   ├── bus/                         # Bus OD files
+│   │   │   ├── bus_od_202512.csv
+│   │   │   ├── bus_od_202601.csv
+│   │   │   └── bus_od_202602.csv
+│   │   ├── train/                       # Train OD files
+│   │   │   ├── train_od_202512.csv
+│   │   │   ├── train_od_202601.csv
+│   │   │   └── train_od_202602.csv
 │   │   ├── bus_stops.json               # 5,202 stops
-│   │   ├── train_stations.json          # 166 stations
-│   │   ├── bus_od_202601.csv           # 5.9M records
-│   │   └── train_od_202601.csv         # 884k records
+│   │   └── train_stations.json          # 166 stations
 │   └── processed/
 ├── credentials/                          # Service account keys (git-ignored)
 │   └── gcp-service-account.json
@@ -747,8 +769,11 @@ GCP_REGION=asia-east1
 
 **Provisioned GCP Resources:**
 - GCS Bucket: `sg-public-transport-data-raw` (with lifecycle rules)
+  - Structure: reference/*.ndjson, journeys/{mode}/{year}/{month}/*.csv
 - GCS Bucket: `sg-public-transport-data-processed` (with lifecycle rules)
 - BigQuery Dataset: `sg_public_transport_analytics` (asia-east1)
+  - Tables: bus_stops (5.2k rows), train_stations (166 rows)
+  - Tables: bus_od (5.9M rows), train_od (884k rows)
 - Service Account: `sg-transport-pipeline-v2@sg-public-transport-pipeline.iam.gserviceaccount.com`
 
 **Installed Tools:**

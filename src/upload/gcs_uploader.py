@@ -266,13 +266,30 @@ class GCSUploader:
         Reference data = static/slowly-changing data used for lookups
         These files contain dimension information (locations, names, codes)
         
+        This method:
+        1. Reads JSON array files from local storage
+        2. Converts to NDJSON (newline-delimited JSON) format for BigQuery
+        3. Uploads to GCS
+        
+        Why NDJSON?
+        - BigQuery loads NDJSON much faster than JSON arrays
+        - Standard format for BigQuery data imports
+        - Each line is a complete JSON object (easier to process)
+        
+        Conversion example:
+        JSON array:        NDJSON:
+        [                  {"code": "01012", "name": "Stop A"}
+          {...},           {"code": "01013", "name": "Stop B"}
+          {...}
+        ]
+        
         This method looks for:
         - data/raw/bus_stops.json
         - data/raw/train_stations.json
         
-        And uploads them to:
-        - gs://bucket/reference/bus_stops.json
-        - gs://bucket/reference/train_stations.json
+        And uploads them as NDJSON to:
+        - gs://bucket/reference/bus_stops.ndjson
+        - gs://bucket/reference/train_stations.ndjson
         
         Returns:
             dict[str, bool]: Upload status for each file
@@ -287,6 +304,9 @@ class GCSUploader:
             else:
                 print(f"Some uploads failed: {results}")
         """
+        import json
+        import tempfile
+        
         logger.info("\n" + "="*70)
         logger.info("📚 UPLOADING REFERENCE DATA")
         logger.info("="*70)
@@ -294,21 +314,71 @@ class GCSUploader:
         results = {}  # Dictionary to store upload results
         
         # Define reference files to upload
-        # Each tuple: (local filename, GCS destination path)
+        # Format: (local filename, table name, GCS destination path)
         reference_files = [
-            ('bus_stops.json', 'reference/bus_stops.json'),
-            ('train_stations.json', 'reference/train_stations.json')
+            ('bus_stops.json', 'bus_stops', 'reference/bus_stops.ndjson'),
+            ('train_stations.json', 'train_stations', 'reference/train_stations.ndjson')
         ]
         
         # Upload each reference file
-        for local_filename, gcs_path in reference_files:
+        for local_filename, key, gcs_path in reference_files:
             local_path = Config.RAW_DATA_DIR / local_filename
             
-            # Extract key name for results dict (e.g., 'bus_stops' from 'bus_stops.json')
-            key = local_filename.replace('.json', '')
+            # Check if file exists
+            if not local_path.exists():
+                logger.error(f"❌ Local file not found: {local_path}")
+                results[key] = False
+                continue
             
-            # Attempt upload and store result
-            results[key] = self.upload_file(local_path, gcs_path)
+            try:
+                # Step 1: Read JSON array from local file
+                logger.info(f"\n📄 Processing {local_filename}...")
+                with open(local_path, 'r', encoding='utf-8') as f:
+                    data = json.load(f)
+                
+                if not isinstance(data, list):
+                    logger.error(f"❌ Expected JSON array, got {type(data)}")
+                    results[key] = False
+                    continue
+                
+                logger.info(f"   Loaded {len(data):,} records")
+                
+                # Step 2: Convert to NDJSON (newline-delimited JSON)
+                # Each line is a separate JSON object
+                logger.info(f"   Converting to NDJSON format...")
+                
+                # Create a temporary file for NDJSON
+                with tempfile.NamedTemporaryFile(
+                    mode='w',
+                    encoding='utf-8',
+                    suffix='.ndjson',
+                    delete=False
+                ) as tmp_file:
+                    temp_path = tmp_file.name
+                    
+                    # Write each record as a separate line
+                    for record in data:
+                        # json.dumps converts dict to JSON string
+                        # ensure_ascii=False keeps special characters (Chinese, etc.)
+                        json_line = json.dumps(record, ensure_ascii=False)
+                        tmp_file.write(json_line + '\n')
+                
+                logger.info(f"   Created NDJSON file: {len(data):,} lines")
+                
+                # Step 3: Upload NDJSON file to GCS
+                success = self.upload_file(temp_path, gcs_path)
+                results[key] = success
+                
+                # Step 4: Clean up temporary file
+                import os
+                os.unlink(temp_path)
+                
+            except json.JSONDecodeError as e:
+                logger.error(f"❌ Invalid JSON in {local_filename}: {e}")
+                results[key] = False
+            except Exception as e:
+                logger.error(f"❌ Error processing {local_filename}: {e}")
+                results[key] = False
         
         logger.info("="*70 + "\n")
         return results
