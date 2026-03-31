@@ -83,12 +83,13 @@ htmlcov/                 # HTML coverage reports
 
 # CRITICAL: These files contain secrets and must NEVER be committed!
 .env
+.env.*
 *.env
 
 # Credentials & keys
 credentials/
 *.json
-!pyproject.toml
+!pyproject.toml          # Exception: allow pyproject.toml
 *.pem                    # Private key files
 *.key                    # Key files
 *.crt                    # Certificate files
@@ -138,12 +139,15 @@ Thumbs.db                # Windows thumbnail cache
 *~                       # Backup files
 
 # ============================================================================
-# Docker (when we add it later)
+# Docker
 # ============================================================================
 
 # Docker volumes and build cache
-.dockerignore            # Uncomment if you want to ignore this
 docker-compose.override.yml  # Local docker-compose overrides
+.docker/                     # Docker build cache
+
+# Docker environment
+.env.docker                  # Docker-specific environment variables
 
 # ============================================================================
 # Terraform (when we add it later)
@@ -166,11 +170,20 @@ logs/                    # Logs directory
 *.out                    # Output files
 *.err                    # Error files
 
-# Airflow (when we add it later)
-airflow/logs/            # Airflow execution logs
+# Airflow
+airflow/logs/            # Airflow execution logs (generated at runtime)
 airflow/*.db             # Airflow SQLite database (local only)
 airflow/*.pid            # Process ID files
 airflow/airflow.cfg      # Local Airflow config (use template instead)
+airflow/webserver_config.py  # Auto-generated webserver config
+.env.airflow             # Airflow environment variables (may contain secrets)
+
+# Airflow runtime directories
+airflow/__pycache__/     # Python cache in Airflow directory
+
+# Streamlit
+streamlit_app/.streamlit/secrets.toml  # Streamlit secrets (contains credentials)
+.streamlit/secrets.toml  # Alternative location for secrets
 
 # Temporary files
 tmp/                     # Temporary directory
@@ -282,3 +295,43 @@ sg_transport_dbt/.user.yml        # User-specific dbt settings
 # profiles.yml typically lives in ~/.dbt/ (not in project)
 # But if someone puts it in project, ignore it (contains credentials!)
 sg_transport_dbt/profiles.yml
+
+# ============================================================================
+# Docker & Airflow Runtime (Phase 6)
+# ============================================================================
+
+# Docker runtime
+docker-compose.override.yml
+.docker/
+
+# Airflow runtime and generated files
+airflow/logs/
+airflow/__pycache__/
+airflow/*.db
+airflow/*.pid
+airflow/airflow.cfg
+airflow/webserver_config.py
+
+# PostgreSQL data (from docker-compose volumes)
+postgres-data/
+
+# ============================================================================
+# Important: What SHOULD be committed from Phase 6
+# ============================================================================
+
+# DO commit:
+# - docker-compose.yml (service orchestration)
+# - Dockerfile (custom Airflow image)
+# - .dockerignore (build optimization)
+# - airflow/dags/ (DAG definitions)
+# - airflow/config/ (configuration files)
+# - airflow/requirements.txt (Python dependencies)
+# - airflow/plugins/ (custom operators)
+# - airflow/README.md (documentation)
+
+# DO NOT commit:
+# - .env.airflow (contains credentials/secrets)
+# - airflow/logs/ (runtime logs)
+# - airflow/*.db (local database files)
+# - docker-compose.override.yml (personal overrides)
+
