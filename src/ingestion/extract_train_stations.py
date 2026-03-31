@@ -246,16 +246,16 @@ def parse_train_stations_excel(excel_content: bytes) -> List[Dict[str, Any]]:
         stations = []
         
         for _, row in df.iterrows():
-            # Clean up the data and standardize field names
-            # Handle different possible column names
+            # Keep original field names to match BigQuery schema
             station = {
-                "station_code": str(row.get('stn_code', '')).strip(),
-                "station_name": str(row.get('mrt_station_english', '')).strip(),
-                "station_name_chinese": str(row.get('mrt_station_chinese', '')).strip()
+                "stn_code": str(row.get('stn_code', '')).strip(),
+                "mrt_station_english": str(row.get('mrt_station_english', '')).strip(),
+                "mrt_station_chinese": str(row.get('mrt_station_chinese', '')).strip(),
+                "mrt_line_english": str(row.get('mrt_line_english', '')).strip()
             }
             
             # Only add if station code exists and is not NaN
-            if station['station_code'] and station['station_code'] != 'nan':
+            if station['stn_code'] and station['stn_code'] != 'nan':
                 stations.append(station)
         
         logger.info(f"Parsed {len(stations)} train stations")
@@ -329,9 +329,9 @@ def print_summary(stations: List[Dict[str, Any]]) -> None:
         
         # Show first 5 stations
         for i, station in enumerate(stations[:5], start=1):
-            print(f"  {i}. Code: {station.get('station_code')}")
-            print(f"     Name (EN): {station.get('station_name')}")
-            print(f"     Name (中文): {station.get('station_name_chinese')}")
+            print(f"  {i}. Code: {station.get('stn_code')}")
+            print(f"     Name (EN): {station.get('mrt_station_english')}")
+            print(f"     Line: {station.get('mrt_line_english')}")
             print()
         
         # Count by line (NS, EW, CC, etc.)
@@ -339,7 +339,7 @@ def print_summary(stations: List[Dict[str, Any]]) -> None:
         line_counts = {}
         for station in stations:
             # Extract line code (e.g., "NS" from "NS1")
-            code = station.get('station_code', '')
+            code = station.get('stn_code', '')
             if code:
                 # Line code is the letters at the start
                 line = ''.join(c for c in code if c.isalpha())
@@ -348,9 +348,17 @@ def print_summary(stations: List[Dict[str, Any]]) -> None:
         for line, count in sorted(line_counts.items()):
             print(f"  {line}: {count} stations")
         
-        # Show complete structure of first station
+        # Show complete structure of first station (without Chinese to avoid encoding issues)
         print("\nComplete structure of first station:")
-        print(json.dumps(stations[0], indent=2, ensure_ascii=False))
+        first = stations[0].copy()
+        # Keep only ASCII-safe fields for display
+        safe_station = {
+            "stn_code": first.get("stn_code"),
+            "mrt_station_english": first.get("mrt_station_english"),
+            "mrt_line_english": first.get("mrt_line_english")
+        }
+        print(json.dumps(safe_station, indent=2))
+    
     
     else:
         print("\nWARNING: No stations retrieved!")

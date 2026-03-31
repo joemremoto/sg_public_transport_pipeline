@@ -30,7 +30,7 @@ WITH source AS (
 cleaned AS (
     SELECT
         -- Time dimensions
-        YEAR_MONTH AS year_month,
+        REPLACE(YEAR_MONTH, '-', '') AS year_month,  -- Remove dashes if present (202601)
         DAY_TYPE AS day_type,
         TIME_PER_HOUR AS hour,
         
