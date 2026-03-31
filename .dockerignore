@@ -1,0 +1,78 @@
+# Docker build optimization - exclude unnecessary files
+# This speeds up the Docker build context transfer
+
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# Documentation
+*.md
+docs/
+README.md
+
+# IDE
+.vscode/
+.cursor/
+.idea/
+*.swp
+*.swo
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+*.egg-info/
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+env/
+
+# Data files (large)
+data/
+*.csv
+*.parquet
+*.zip
+*.gz
+
+# Logs
+logs/
+*.log
+
+# Airflow (will be mounted as volumes)
+airflow/logs/
+airflow/*.db
+airflow/*.pid
+
+# Terraform
+terraform/
+*.tfstate
+*.tfstate.*
+.terraform/
+
+# Tests
+tests/
+.coverage
+htmlcov/
+
+# Environment files (will be passed as env vars)
+.env
+*.env
+.env.*
+
+# Build artifacts
+dist/
+build/
+*.egg-info/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# dbt artifacts (will be generated in container)
+sg_transport_dbt/target/
+sg_transport_dbt/dbt_packages/
+sg_transport_dbt/logs/
