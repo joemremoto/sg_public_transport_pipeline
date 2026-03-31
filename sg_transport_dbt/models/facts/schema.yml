@@ -1,0 +1,116 @@
+version: 2
+
+models:
+  - name: fact_bus_journeys
+    description: >
+      Bus journey fact table - the central table for bus analytics.
+      Contains aggregated trip counts between bus stops with full dimensional context.
+      Partitioned by date and clustered for optimal query performance.
+    
+    columns:
+      - name: bus_journey_key
+        description: Surrogate key for this specific journey record
+        tests:
+          - unique
+          - not_null
+      
+      - name: origin_bus_stop_key
+        description: Foreign key to dim_bus_stops (origin)
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_bus_stops')
+              field: bus_stop_key
+      
+      - name: destination_bus_stop_key
+        description: Foreign key to dim_bus_stops (destination)
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_bus_stops')
+              field: bus_stop_key
+      
+      - name: date_key
+        description: Foreign key to dim_date (YYYYMMDD format)
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_date')
+              field: date_key
+      
+      - name: time_period_key
+        description: Foreign key to dim_time_period (hour 0-23)
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_time_period')
+              field: time_period_key
+      
+      - name: day_type
+        description: Type of day (WEEKDAY or WEEKENDS/HOLIDAY)
+      
+      - name: year_month
+        description: Period in YYYYMM format
+      
+      - name: trip_count
+        description: Aggregate count of passenger trips (measure)
+      
+      - name: _loaded_at
+        description: Timestamp when record was loaded into warehouse
+
+  - name: fact_train_journeys
+    description: >
+      Train journey fact table - the central table for train analytics.
+      Contains aggregated trip counts between train stations with full dimensional context.
+      Partitioned by date and clustered for optimal query performance.
+    
+    columns:
+      - name: train_journey_key
+        description: Surrogate key for this specific journey record
+        tests:
+          - unique
+          - not_null
+      
+      - name: origin_station_key
+        description: Foreign key to dim_train_stations (origin)
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_train_stations')
+              field: station_key
+      
+      - name: destination_station_key
+        description: Foreign key to dim_train_stations (destination)
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_train_stations')
+              field: station_key
+      
+      - name: date_key
+        description: Foreign key to dim_date (YYYYMMDD format)
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_date')
+              field: date_key
+      
+      - name: time_period_key
+        description: Foreign key to dim_time_period (hour 0-23)
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_time_period')
+              field: time_period_key
+      
+      - name: day_type
+        description: Type of day (WEEKDAY or WEEKENDS/HOLIDAY)
+      
+      - name: year_month
+        description: Period in YYYYMM format
+      
+      - name: trip_count
+        description: Aggregate count of passenger trips (measure)
+      
+      - name: _loaded_at
+        description: Timestamp when record was loaded into warehouse

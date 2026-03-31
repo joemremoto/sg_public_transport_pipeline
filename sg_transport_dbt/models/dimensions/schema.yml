@@ -1,0 +1,119 @@
+version: 2
+
+models:
+  - name: dim_bus_stops
+    description: >
+      Bus stop dimension table with surrogate keys.
+      Contains geographic and descriptive information for all bus stops in Singapore.
+    columns:
+      - name: bus_stop_key
+        description: Surrogate key (hash of bus_stop_code) - use for joins
+        tests:
+          - unique
+          - not_null
+      
+      - name: bus_stop_code
+        description: Natural key - original 5-digit bus stop code from LTA
+        tests:
+          - unique
+          - not_null
+      
+      - name: road_name
+        description: Name of road where bus stop is located
+      
+      - name: description
+        description: Human-readable description (landmark/location)
+      
+      - name: latitude
+        description: Geographic latitude coordinate
+      
+      - name: longitude
+        description: Geographic longitude coordinate
+
+  - name: dim_train_stations
+    description: >
+      Train station dimension table with surrogate keys.
+      Contains information for all MRT/LRT stations in Singapore.
+    columns:
+      - name: station_key
+        description: Surrogate key (hash of station_code) - use for joins
+        tests:
+          - unique
+          - not_null
+      
+      - name: station_code
+        description: Natural key - station code (e.g., NS1, EW12)
+        tests:
+          - unique
+          - not_null
+      
+      - name: station_name
+        description: Official English station name
+      
+      - name: station_name_chinese
+        description: Chinese station name
+      
+      - name: line_name
+        description: Full MRT/LRT line name
+      
+      - name: line_code
+        description: Extracted line code from station code (e.g., NS, EW)
+
+  - name: dim_date
+    description: >
+      Date dimension table for temporal analysis.
+      Generated dimension covering 2025-2027.
+      Provides rich calendar attributes for analytical queries.
+    columns:
+      - name: date_key
+        description: Surrogate key in YYYYMMDD format (e.g., 20260115)
+        tests:
+          - unique
+          - not_null
+      
+      - name: date
+        description: Actual date value
+      
+      - name: year
+        description: Year (e.g., 2026)
+      
+      - name: month
+        description: Month number (1-12)
+      
+      - name: day
+        description: Day of month (1-31)
+      
+      - name: quarter
+        description: Quarter (1-4)
+      
+      - name: day_of_week_number
+        description: Day of week (1=Sunday, 7=Saturday)
+      
+      - name: is_weekend
+        description: TRUE if Saturday or Sunday
+      
+      - name: is_weekday
+        description: TRUE if Monday-Friday
+
+  - name: dim_time_period
+    description: >
+      Time period dimension for hourly analysis.
+      Generated dimension mapping hours (0-23) to meaningful categories.
+    columns:
+      - name: time_period_key
+        description: Surrogate key (hour 0-23)
+        tests:
+          - unique
+          - not_null
+      
+      - name: hour
+        description: Hour of day (0-23)
+      
+      - name: time_period_name
+        description: Time period category (Night, AM Peak, Inter-Peak, PM Peak, Evening)
+      
+      - name: is_peak_hour
+        description: TRUE if hour is 7, 8, 17, 18, or 19
+      
+      - name: part_of_day
+        description: General part of day (Late Night, Morning, Afternoon, Evening)
