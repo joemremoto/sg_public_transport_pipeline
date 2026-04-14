@@ -370,6 +370,14 @@ None currently blocking progress.
 
 ## Recent Changes
 
+**2026-03-31 (Setup Documentation Created):**
+- ✅ Created comprehensive `SETUP-GUIDE.md` for new machine setup
+- ✅ Created `QUICKSTART.md` for fast-track setup (15 min)
+- ✅ Created `SETUP-CHECKLIST.md` with step-by-step verification
+- ✅ Created `.env.example` templates (project root + streamlit_app/)
+- ✅ Updated main `README.md` with project overview and quick start
+- ✅ Documentation now enables easy repo cloning and setup on new machines
+
 **2026-03-31 (Phase 7 Complete):**
 - ✅ Created Streamlit dashboard application
 - ✅ Implemented BigQuery integration with caching
