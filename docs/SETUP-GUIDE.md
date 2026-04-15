@@ -19,6 +19,13 @@ Complete setup guide for cloning and running this project on a new machine with 
 8. [Environment Variables](#environment-variables)
 9. [LTA API Setup](#lta-api-setup)
 10. [Testing the Pipeline](#testing-the-pipeline)
+    - [Phase 1: Test Data Extraction](#phase-1-test-data-extraction)
+    - [Phase 2: Test Infrastructure](#phase-2-test-infrastructure-already-done-via-terraform)
+    - [Phase 3: Test GCS Upload](#phase-3-test-gcs-upload)
+    - [Phase 4: Test BigQuery Load](#phase-4-test-bigquery-load)
+    - [Phase 5: Test dbt Transformation](#phase-5-test-dbt-transformation)
+    - [Phase 6: Docker & Airflow Setup (Optional)](#phase-6-docker--airflow-setup-optional)
+    - [Phase 7: Test Streamlit Dashboard](#phase-7-test-streamlit-dashboard)
 11. [Troubleshooting](#troubleshooting)
 
 ---
@@ -49,6 +56,15 @@ Complete setup guide for cloning and running this project on a new machine with 
 - **VS Code** or **Cursor** (code editor)
   - VS Code: https://code.visualstudio.com/
   - Cursor: https://cursor.sh/
+
+### Optional: For Airflow Orchestration (Phase 6)
+
+- **Docker Desktop** (for running Airflow)
+  - Windows: https://docs.docker.com/desktop/install/windows-install/
+  - Mac: https://docs.docker.com/desktop/install/mac-install/
+  - Linux: https://docs.docker.com/desktop/install/linux-install/
+  - Requires: 4GB+ RAM available
+  - Note: Can skip if you prefer running pipeline manually
 
 ---
 
@@ -364,20 +380,9 @@ source .venv/bin/activate
 
 **Core project dependencies:**
 ```bash
-# Ensure virtual environment is activated
-# Should see (.venv) in terminal prompt
-
-# Install with pip
+uv sync
+# Alternative: Using pip (if you don't have uv)
 pip install -e .
-
-# Or install specific groups
-pip install google-cloud-storage google-cloud-bigquery
-pip install requests pandas python-dotenv
-```
-
-**dbt dependencies:**
-```bash
-pip install dbt-core==1.9.0 dbt-bigquery==1.9.0
 ```
 
 **Streamlit dependencies:**
@@ -535,7 +540,7 @@ import requests
 load_dotenv()
 api_key = os.getenv('LTA_ACCOUNT_KEY')
 headers = {'AccountKey': api_key}
-response = requests.get('http://datamall2.mytransport.sg/ltaodataservice/BusStops?$top=1', headers=headers)
+response = requests.get('https://datamall2.mytransport.sg/ltaodataservice/BusStops?$top=1', headers=headers)
 print(f'Status: {response.status_code}')
 print(f'Success!' if response.status_code == 200 else 'Failed!')
 "
@@ -575,7 +580,7 @@ gcloud bigquery datasets list
 
 ```bash
 # Upload reference data
-python scripts/upload_to_gcs.py --data-type reference
+python scripts/upload_to_gcs.py --reference-only
 
 # Verify in GCS
 gsutil ls gs://sg-public-transport-data-raw/reference/
@@ -586,7 +591,7 @@ gsutil ls gs://sg-public-transport-data-raw/reference/
 
 ```bash
 # Load reference tables
-python scripts/load_to_bq.py --table-type reference
+python scripts/load_to_bq.py --reference
 
 # Verify in BigQuery
 bq query --use_legacy_sql=false \
@@ -617,6 +622,369 @@ dbt test
 # Completed successfully
 # All tests passed
 ```
+
+---
+
+## Phase 6: Docker & Airflow Setup (Optional)
+
+**Note:** This phase is optional. Airflow orchestrates the pipeline automatically, but you can run the pipeline manually without it.
+
+### Prerequisites
+
+- **Docker Desktop** installed and running
+  - Windows: https://docs.docker.com/desktop/install/windows-install/
+  - Mac: https://docs.docker.com/desktop/install/mac-install/
+  - Linux: https://docs.docker.com/desktop/install/linux-install/
+- **Docker Compose** (included with Docker Desktop)
+- At least 4GB RAM available for Docker
+
+### Step 1: Verify Docker Installation
+
+```bash
+# Check Docker is installed and running
+docker --version
+docker-compose --version
+
+# Test Docker works
+docker run hello-world
+```
+
+**Expected output:** Docker version info and "Hello from Docker!" message
+
+---
+
+### Step 2: Create Airflow Environment File
+
+Create `.env.airflow` in project root:
+
+```bash
+# Create file
+# Windows PowerShell:
+New-Item .env.airflow -ItemType File
+
+# Mac/Linux:
+touch .env.airflow
+```
+
+**Add these contents:**
+
+```bash
+# Airflow Web UI credentials
+_AIRFLOW_WWW_USER_USERNAME=admin
+_AIRFLOW_WWW_USER_PASSWORD=admin
+
+# Airflow UID (for volume permissions)
+AIRFLOW_UID=50000
+
+# LTA API Key (copy from main .env)
+LTA_ACCOUNT_KEY=YOUR_LTA_API_KEY_HERE
+```
+
+**⚠️ Important:**
+- Replace `YOUR_LTA_API_KEY_HERE` with your actual LTA API key
+- Change the password for production use
+
+---
+
+### Step 3: Build Custom Airflow Image
+
+The project uses a custom Docker image with all dependencies pre-installed.
+
+```bash
+# From project root
+docker-compose build
+
+# This takes 5-10 minutes on first build
+# Subsequent builds are faster (uses cache)
+```
+
+**What's being built:**
+- Base: Apache Airflow 2.10.4 with Python 3.10
+- Installed: Google Cloud libraries, dbt, project dependencies
+- Configured: Volume mounts for DAGs, logs, credentials
+
+---
+
+### Step 4: Initialize Airflow Database
+
+```bash
+# Initialize Airflow (one-time setup)
+docker-compose up airflow-init
+
+# Wait for message: "Airflow initialized successfully"
+# Then press Ctrl+C
+```
+
+**What this does:**
+- Creates PostgreSQL database for Airflow metadata
+- Creates admin user account
+- Sets up Airflow configuration
+
+---
+
+### Step 5: Start Airflow Services
+
+```bash
+# Start all services in background
+docker-compose up -d
+
+# Check services are running
+docker-compose ps
+
+# Expected output: 3 services running
+# - postgres (database)
+# - airflow-webserver (UI on port 8080)
+# - airflow-scheduler (runs DAGs)
+```
+
+**Wait 30-60 seconds** for services to fully start.
+
+---
+
+### Step 6: Access Airflow Web UI
+
+1. Open browser: http://localhost:8080
+2. **Login:**
+   - Username: `admin`
+   - Password: `admin` (or what you set in `.env.airflow`)
+
+**You should see:**
+- Airflow dashboard
+- List of DAGs
+- One DAG: `sg_public_transport_monthly_pipeline`
+
+---
+
+### Step 7: Test the Pipeline DAG
+
+**In the Airflow UI:**
+
+1. Find `sg_public_transport_monthly_pipeline` in the DAG list
+2. Toggle the switch to **ON** (activates the DAG)
+3. Click on the DAG name to open details
+4. Click **"Trigger DAG"** button (play icon)
+5. Optionally set configuration (or leave default for current month)
+6. Click **"Trigger"**
+
+**Monitor execution:**
+- Click **"Graph"** view to see task dependencies
+- Click **"Grid"** view to see run history
+- Click individual tasks to view logs
+- Green = success, Red = failure, Yellow = running
+
+**Expected duration:** 20-30 minutes for full pipeline
+
+---
+
+### Step 8: Verify Pipeline Results
+
+**Check BigQuery for new data:**
+
+```bash
+# Query fact table for the processed month
+bq query --use_legacy_sql=false \
+  'SELECT year_month, COUNT(*) as trip_count 
+   FROM `sg_public_transport_analytics.fact_od_trips` 
+   GROUP BY year_month 
+   ORDER BY year_month DESC 
+   LIMIT 5'
+```
+
+**Check Airflow logs:**
+
+```bash
+# View scheduler logs
+docker-compose logs -f airflow-scheduler
+
+# View webserver logs
+docker-compose logs -f airflow-webserver
+
+# View all logs
+docker-compose logs -f
+```
+
+---
+
+### Step 9: Understanding the DAG
+
+**The DAG orchestrates 13 tasks in 5 groups:**
+
+1. **Extract from LTA** (4 tasks)
+   - Extract bus stops
+   - Extract train stations
+   - Extract bus OD (previous month)
+   - Extract train OD (previous month)
+
+2. **Upload to GCS** (2 tasks)
+   - Upload reference data
+   - Upload journey data
+
+3. **Load to BigQuery** (2 tasks)
+   - Load reference tables
+   - Load OD tables
+
+4. **dbt Transform** (3 tasks)
+   - Install dbt packages
+   - Run dbt models
+   - Run dbt tests
+
+5. **Data Quality** (1 task)
+   - Validate fact table counts
+
+**Schedule:** Monthly on the 15th at 9:00 AM UTC (after LTA releases data)
+
+---
+
+### Common Airflow Commands
+
+```bash
+# Start Airflow
+docker-compose up -d
+
+# Stop Airflow
+docker-compose down
+
+# Stop and remove all data (WARNING: destructive!)
+docker-compose down -v
+
+# Restart services
+docker-compose restart
+
+# Rebuild after code changes
+docker-compose build --no-cache
+docker-compose up -d
+
+# View logs
+docker-compose logs -f airflow-scheduler
+docker-compose logs -f airflow-webserver
+
+# Access Airflow CLI
+docker-compose exec airflow-webserver bash
+
+# Inside container, run:
+airflow dags list
+airflow dags test sg_public_transport_monthly_pipeline 2026-01-01
+```
+
+---
+
+### Airflow Directory Structure
+
+```
+airflow/
+├── dags/                         # DAG definitions
+│   └── sg_transport_monthly_pipeline.py
+├── logs/                         # Task execution logs (auto-generated)
+├── config/
+│   ├── profiles.yml             # dbt BigQuery connection
+│   └── ALERTING.md              # Alerting setup guide
+├── requirements.txt             # Python dependencies
+└── README.md                    # Quick reference
+```
+
+---
+
+### Troubleshooting Airflow
+
+**Issue: Services won't start**
+
+```bash
+# Check Docker is running
+docker ps
+
+# Check logs for errors
+docker-compose logs
+
+# Restart Docker Desktop
+# Then try: docker-compose up -d
+```
+
+---
+
+**Issue: DAG not appearing in UI**
+
+```bash
+# Check for syntax errors
+docker-compose exec airflow-webserver python -m py_compile /opt/airflow/dags/sg_transport_monthly_pipeline.py
+
+# Check scheduler logs
+docker-compose logs airflow-scheduler | grep ERROR
+```
+
+---
+
+**Issue: Tasks failing with credential errors**
+
+**Verify credentials are mounted:**
+
+```bash
+# Check if credentials are accessible in container
+docker-compose exec airflow-webserver ls -l /opt/airflow/credentials/
+
+# Should show: gcp-service-account.json
+```
+
+**If missing:**
+- Ensure `credentials/gcp-service-account.json` exists in project root
+- Check `docker-compose.yml` has correct volume mount
+- Restart services: `docker-compose down && docker-compose up -d`
+
+---
+
+**Issue: Permission denied errors**
+
+```bash
+# Check Airflow UID in .env.airflow
+cat .env.airflow | grep AIRFLOW_UID
+
+# Should be: AIRFLOW_UID=50000
+
+# Fix permissions (if needed)
+# Linux/Mac:
+sudo chown -R 50000:0 airflow/logs/
+
+# Windows: Usually not needed
+```
+
+---
+
+**Issue: Port 8080 already in use**
+
+```bash
+# Find what's using port 8080
+# Windows:
+netstat -ano | findstr :8080
+
+# Mac/Linux:
+lsof -i :8080
+
+# Change Airflow port in docker-compose.yml:
+# Find: "8080:8080"
+# Change to: "8081:8080"
+# Then: docker-compose up -d
+# Access at: http://localhost:8081
+```
+
+---
+
+### When to Use Airflow
+
+**Use Airflow when:**
+- ✅ You want automated monthly pipeline runs
+- ✅ You need monitoring and alerting
+- ✅ You want task retry and failure handling
+- ✅ You need to track pipeline history
+- ✅ Multiple people need to monitor the pipeline
+
+**Skip Airflow when:**
+- ⏭️ Just learning the pipeline
+- ⏭️ Running pipeline manually is sufficient
+- ⏭️ Docker installation issues
+- ⏭️ Limited system resources (< 4GB RAM)
+
+**Alternative:** Run pipeline steps manually (already tested in Phases 1-5)
+
+---
 
 ### Phase 7: Test Streamlit Dashboard
 
