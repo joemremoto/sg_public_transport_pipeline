@@ -1,0 +1,39 @@
+---
+description: Prevent automatic creation of documentation markdown files
+alwaysApply: true
+---
+
+# Documentation Creation Policy
+
+## Do NOT Create Documentation Files Unless Explicitly Requested
+
+**Never** automatically create markdown files that:
+- Explain changes made to code files
+- Document the logic behind created files
+- Provide implementation guides or enhancement documents
+- Describe bug fixes or modifications
+
+### Examples of Files NOT to Create (unless user explicitly requests):
+
+- `IMPLEMENTATION_GUIDE.md`
+- `BUG_FIX_*.md`
+- `*_ENHANCEMENT.md`
+- `CHANGES.md`
+- Any other explanatory documentation
+
+### When to Create Documentation
+
+**Only** create documentation markdown files when the user:
+- Explicitly asks: "create documentation for this"
+- Requests: "write a guide for..."
+- Says: "document the changes"
+- Specifically mentions they want a markdown file
+
+### What to Do Instead
+
+When making changes:
+- Add code comments if logic is complex
+- Explain changes briefly in the chat response
+- Answer questions about the implementation directly
+
+**Key principle**: The user will ask if they want documentation. Don't be proactive about creating markdown files.

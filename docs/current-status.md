@@ -370,6 +370,14 @@ None currently blocking progress.
 
 ## Recent Changes
 
+**2026-04-15 (Setup Documentation Enhanced):**
+- ✅ Added comprehensive Docker + Airflow setup to `SETUP-GUIDE.md`
+- ✅ Added Phase 6 (Airflow) instructions with step-by-step Docker setup
+- ✅ Included troubleshooting for common Docker/Airflow issues
+- ✅ Updated `QUICKSTART.md` with optional Airflow section
+- ✅ Added Docker Desktop to optional prerequisites
+- ✅ Documentation now covers all 7 phases end-to-end
+
 **2026-03-31 (Setup Documentation Created):**
 - ✅ Created comprehensive `SETUP-GUIDE.md` for new machine setup
 - ✅ Created `QUICKSTART.md` for fast-track setup (15 min)

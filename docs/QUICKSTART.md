@@ -154,6 +154,35 @@ streamlit run app.py
 
 ---
 
+## 6. Optional: Setup Airflow Orchestration
+
+If you want automated pipeline execution:
+
+```bash
+# Install Docker Desktop first
+# https://docs.docker.com/desktop/
+
+# Create Airflow environment file
+cat > .env.airflow << EOF
+_AIRFLOW_WWW_USER_USERNAME=admin
+_AIRFLOW_WWW_USER_PASSWORD=admin
+AIRFLOW_UID=50000
+LTA_ACCOUNT_KEY=YOUR_LTA_API_KEY_HERE
+EOF
+
+# Build and start Airflow
+docker-compose build
+docker-compose up airflow-init
+docker-compose up -d
+
+# Access Airflow UI: http://localhost:8080
+# Login: admin / admin
+```
+
+**Full Airflow setup:** See `docs/SETUP-GUIDE.md#phase-6-docker--airflow-setup-optional`
+
+---
+
 ## Troubleshooting
 
 **Credentials not found:**
