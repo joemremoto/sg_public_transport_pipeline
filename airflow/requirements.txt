@@ -1,13 +1,6 @@
-# Airflow providers
-apache-airflow-providers-google==10.24.0
+# Airflow providers (using older, more stable version)
+apache-airflow-providers-google==10.17.0
 apache-airflow-providers-postgres==5.13.0
-
-# Pin protobuf first to resolve conflicts (dbt-core 1.9.0 requires >=5.0)
-protobuf==5.28.3
-
-# Pin compatible versions to avoid pip backtracking
-grpc-google-iam-v1==0.13.1
-googleapis-common-protos==1.65.0
 
 # GCP dependencies
 google-cloud-storage==2.18.2
