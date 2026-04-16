@@ -1,5 +1,5 @@
-# Airflow providers (versions will be constrained by Airflow's constraint file)
-apache-airflow-providers-google==10.24.0
+# Airflow providers (use versions from constraint file)
+apache-airflow-providers-google==11.0.0
 apache-airflow-providers-postgres==5.13.0
 
 # GCP dependencies
