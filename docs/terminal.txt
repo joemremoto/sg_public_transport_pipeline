@@ -1,22 +1,46 @@
-#9 20.99 Collecting grpc-google-iam-v1<1.0.0dev,>=0.12.4 (from google-cloud-bigtable>=2.17.0->apache-airflow-providers-google==10.24.0->-r /requirements.txt (line 2))
-#9 21.00   Downloading grpc_google_iam_v1-0.14.4-py3-none-any.whl.metadata (9.1 kB)
-#9 35.64   Downloading grpc_google_iam_v1-0.14.3-py3-none-any.whl.metadata (9.2 kB)
-#9 49.78   Downloading grpc_google_iam_v1-0.14.2-py3-none-any.whl.metadata (9.1 kB)
-#9 63.82   Downloading grpc_google_iam_v1-0.14.1-py2.py3-none-any.whl.metadata (9.2 kB)
-#9 77.95   Downloading grpc_google_iam_v1-0.14.0-py2.py3-none-any.whl.metadata (3.3 kB)
-#9 92.19   Downloading grpc_google_iam_v1-0.13.1-py2.py3-none-any.whl.metadata (3.3 kB)
-#9 106.6   Downloading grpc_google_iam_v1-0.13.0-py2.py3-none-any.whl.metadata (3.3 kB)
-#9 106.8 INFO: pip is looking at multiple versions of grpc-google-iam-v1 to determine which version is compatible with other requirements. This could take a while.
-#9 106.8   Downloading grpc_google_iam_v1-0.12.7-py2.py3-none-any.whl.metadata (3.3 kB)
-#9 106.8   Downloading grpc_google_iam_v1-0.12.6-py2.py3-none-any.whl.metadata (3.2 kB)
-#9 106.8   Downloading grpc_google_iam_v1-0.12.4-py2.py3-none-any.whl.metadata (3.2 kB)
-#9 121.0 INFO: pip is still looking at multiple versions of grpc-google-iam-v1 to determine which version is compatible with other requirements. This could take a while.
-#9 121.0 Collecting googleapis-common-protos<2.0.0,>=1.56.3 (from google-ads>=25.0.0->apache-airflow-providers-google==10.24.0->-r /requirements.txt (line 2))
-#9 121.0   Downloading googleapis_common_protos-1.74.0-py3-none-any.whl.metadata (9.2 kB)
-#9 227.8 INFO: This is taking longer than usual. You might need to provide the dependency resolver with stricter constraints to reduce runtime. See https://pip.pypa.io/warnings/backtracking for guidance. If you want to abort this run, press Ctrl + C.
-#9 227.8   Downloading googleapis_common_protos-1.73.1-py3-none-any.whl.metadata (9.2 kB)
-#9 332.0   Downloading googleapis_common_protos-1.73.0-py3-none-any.whl.metadata (9.4 kB)
-#9 435.8   Downloading googleapis_common_protos-1.72.0-py3-none-any.whl.metadata (9.4 kB)
-#9 539.5   Downloading googleapis_common_protos-1.71.0-py3-none-any.whl.metadata (9.4 kB)
-#9 643.0   Downloading googleapis_common_protos-1.70.0-py3-none-any.whl.metadata (9.3 kB)
-#9 747.0   Downloading googleapis_common_protos-1.69.2-py3-none-any.whl.metadata (9.3 kB)
+#9 3.714 INFO: pip is looking at multiple versions of dbt-core to determine which version is compatible with other requirements. This could take a while.
+#9 3.717 ERROR: Cannot install -r /requirements.txt (line 15), -r /requirements.txt (line 6) and -r /requirements.txt (line 7) because these package versions have conflicting dependencies.
+#9 3.717 
+#9 3.717 The conflict is caused by:
+#9 3.717     grpc-google-iam-v1 0.12.6 depends on protobuf!=3.20.0, !=3.20.1, !=4.21.1, !=4.21.2, !=4.21.3, !=4.21.4, !=4.21.5, <5.0.0dev and >=3.19.5
+#9 3.717     googleapis-common-protos 1.63.2 depends on protobuf!=3.20.0, !=3.20.1, !=4.21.1, !=4.21.2, !=4.21.3, !=4.21.4, !=4.21.5, <6.0.0.dev0 and >=3.20.2
+#9 3.717     dbt-core 1.9.0 depends on protobuf<6.0 and >=5.0
+#9 3.717 
+#9 3.717 To fix this you could try to:
+#9 3.717 1. loosen the range of package versions you've specified
+#9 3.717 2. remove package versions to allow pip to attempt to solve the dependency conflict
+#9 3.717 
+#9 3.718 ERROR: ResolutionImpossible: for help visit https://pip.pypa.io/en/latest/topics/dependency-resolution/#dealing-with-dependency-conflicts
+#9 ERROR: process "/bin/bash -o pipefail -o errexit -o nounset -o nolog -c pip install --no-cache-dir --disable-pip-version-check -r /requirements.txt" did not complete successfully: exit code: 1
+------
+ > [airflow-scheduler 4/5] RUN pip install --no-cache-dir --disable-pip-version-check -r /requirements.txt:
+3.717 The conflict is caused by:
+3.717     grpc-google-iam-v1 0.12.6 depends on protobuf!=3.20.0, !=3.20.1, !=4.21.1, !=4.21.2, !=4.21.3, !=4.21.4, !=4.21.5, <5.0.0dev and >=3.19.5
+3.717     googleapis-common-protos 1.63.2 depends on protobuf!=3.20.0, !=3.20.1, !=4.21.1, !=4.21.2, !=4.21.3, !=4.21.4, !=4.21.5, <6.0.0.dev0 and >=3.20.2
+3.717     dbt-core 1.9.0 depends on protobuf<6.0 and >=5.0
+3.717 
+3.717 To fix this you could try to:
+3.717 1. loosen the range of package versions you've specified
+3.717 2. remove package versions to allow pip to attempt to solve the dependency conflict
+3.717 
+3.718 ERROR: ResolutionImpossible: for help visit https://pip.pypa.io/en/latest/topics/dependency-resolution/#dealing-with-dependency-conflicts
+------
+[+] build 0/1
+ - Image sg-transport-airflow:latest Building                                                                                                                                                                                   6.3s
+Dockerfile:17
+
+--------------------
+
+  15 |     # Copy and install Python requirements
+
+  16 |     COPY airflow/requirements.txt /requirements.txt
+
+  17 | >>> RUN pip install --no-cache-dir --disable-pip-version-check -r /requirements.txt
+
+  18 |     
+
+  19 |     # Install the project source as a package
+
+--------------------
+
+target airflow-webserver: failed to solve: process "/bin/bash -o pipefail -o errexit -o nounset -o nolog -c pip install --no-cache-dir --disable-pip-version-check -r /requirements.txt" did not complete successfully: exit code: 1
