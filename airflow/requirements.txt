@@ -1,5 +1,5 @@
-# Airflow providers (using older, more stable version)
-apache-airflow-providers-google==10.17.0
+# Airflow providers (versions will be constrained by Airflow's constraint file)
+apache-airflow-providers-google==10.24.0
 apache-airflow-providers-postgres==5.13.0
 
 # GCP dependencies
@@ -7,7 +7,7 @@ google-cloud-storage==2.18.2
 google-cloud-bigquery==3.28.0
 google-auth==2.36.0
 
-# dbt
+# dbt (these may need adjustment if constraints conflict)
 dbt-core==1.9.0
 dbt-bigquery==1.9.0
 
