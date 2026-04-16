@@ -1,24 +1,46 @@
- 11.39 Collecting grpcio<2.0.0,>=1.59.0 (from google-ads>=23.1.0->apache-airflow-providers-google==10.17.0->-r /requirements.txt (line 2))
-#9 11.40   Downloading grpcio-1.80.0-cp310-cp310-manylinux2014_x86_64.manylinux_2_17_x86_64.whl.metadata (3.8 kB)
-#9 11.80 INFO: This is taking longer than usual. You might need to provide the dependency resolver with stricter constraints to reduce runtime. See https://pip.pypa.io/warnings/backtracking for guidance. If you want to abort this run, press Ctrl + C.
-#9 11.83 Collecting grpcio-status<2.0.0,>=1.59.0 (from google-ads>=23.1.0->apache-airflow-providers-google==10.17.0->-r /requirements.txt (line 2))
-#9 11.84   Downloading grpcio_status-1.71.0-py3-none-any.whl.metadata (1.1 kB)
-#9 12.19 INFO: pip is still looking at multiple versions of opentelemetry-proto to determine which version is compatible with other requirements. This could take a while.
-#9 12.27   Downloading grpcio_status-1.70.0-py3-none-any.whl.metadata (1.1 kB)
-#9 12.69   Downloading grpcio_status-1.69.0-py3-none-any.whl.metadata (1.1 kB)
-#9 13.11   Downloading grpcio_status-1.68.1-py3-none-any.whl.metadata (1.1 kB)
-#9 13.43 INFO: This is taking longer than usual. You might need to provide the dependency resolver with stricter constraints to reduce runtime. See https://pip.pypa.io/warnings/backtracking for guidance. If you want to abort this run, press Ctrl + C.
-#9 13.53   Downloading grpcio_status-1.68.0-py3-none-any.whl.metadata (1.1 kB)
 
-#9 71.05   Downloading grpc_google_iam_v1-0.14.1-py2.py3-none-any.whl.metadata (9.2 kB)
-#9 86.23   Downloading grpc_google_iam_v1-0.14.0-py2.py3-none-any.whl.metadata (3.3 kB)
-#9 101.2   Downloading grpc_google_iam_v1-0.13.1-py2.py3-none-any.whl.metadata (3.3 kB)
-#9 116.1   Downloading grpc_google_iam_v1-0.13.0-py2.py3-none-any.whl.metadata (3.3 kB)
-#9 116.2 INFO: pip is looking at multiple versions of grpc-google-iam-v1 to determine which version is compatible with other requirements. This could take a while.
-#9 116.2   Downloading grpc_google_iam_v1-0.12.7-py2.py3-none-any.whl.metadata (3.3 kB)
-#9 116.2   Downloading grpc_google_iam_v1-0.12.6-py2.py3-none-any.whl.metadata (3.2 kB)
-#9 116.3   Downloading grpc_google_iam_v1-0.12.4-py2.py3-none-any.whl.metadata (3.2 kB)
-#9 131.9 INFO: pip is still looking at multiple versions of grpc-google-iam-v1 to determine which version is compatible with other requirements. This could take a while.
-#9 132.0 Collecting googleapis-common-protos<2.0.0,>=1.56.3 (from google-ads>=23.1.0->apache-airflow-providers-google==10.17.0->-r /requirements.txt (line 2))
-#9 132.0   Downloading googleapis_common_protos-1.74.0-py3-none-any.whl.metadata (9.2 kB)
-#9 249.8 INFO: This is taking longer than usual. You might need to provide the dependency resolver with stricter constraints to reduce runtime. See https://pip.pypa.io/warnings/backtracking for guidance. If you want to abort this run, press Ctrl + C.
+#9 [airflow-webserver 4/5] RUN pip install --no-cache-dir --disable-pip-version-check -r /requirements.txt --constraint "https://raw.githubusercontent.com/apache/airflow/constraints-2.10.4/constraints-3.10.txt"
+#9 2.238 ERROR: Cannot install apache-airflow-providers-google==10.24.0 because these package versions have conflicting dependencies.
+#9 2.238 
+#9 2.238 The conflict is caused by:
+#9 2.238     The user requested apache-airflow-providers-google==10.24.0
+#9 2.238     The user requested (constraint) apache-airflow-providers-google==11.0.0
+#9 2.238 
+#9 2.238 To fix this you could try to:
+#9 2.238 1. loosen the range of package versions you've specified
+#9 2.238 2. remove package versions to allow pip to attempt to solve the dependency conflict
+#9 2.238 
+#9 2.238 ERROR: ResolutionImpossible: for help visit https://pip.pypa.io/en/latest/topics/dependency-resolution/#dealing-with-dependency-conflicts
+#9 ERROR: process "/bin/bash -o pipefail -o errexit -o nounset -o nolog -c pip install --no-cache-dir --disable-pip-version-check -r /requirements.txt --constraint \"${CONSTRAINT_URL}\"" did not complete successfully: exit code: 1
+------
+ > [airflow-init 4/5] RUN pip install --no-cache-dir --disable-pip-version-check -r /requirements.txt --constraint "https://raw.githubusercontent.com/apache/airflow/constraints-2.10.4/constraints-3.10.txt":
+2.238 
+2.238 The conflict is caused by:
+2.238     The user requested apache-airflow-providers-google==10.24.0
+2.238     The user requested (constraint) apache-airflow-providers-google==11.0.0
+2.238 
+2.238 To fix this you could try to:
+2.238 1. loosen the range of package versions you've specified
+2.238 2. remove package versions to allow pip to attempt to solve the dependency conflict
+2.238 
+2.238 ERROR: ResolutionImpossible: for help visit https://pip.pypa.io/en/latest/topics/dependency-resolution/#dealing-with-dependency-conflicts
+------
+[+] build 0/1
+ - Image sg-transport-airflow:latest Building                                                                                                                                                                                   4.6s
+Dockerfile:22
+
+--------------------
+
+  20 |     # Copy and install Python requirements with constraints
+
+  21 |     COPY airflow/requirements.txt /requirements.txt
+
+  22 | >>> RUN pip install --no-cache-dir --disable-pip-version-check -r /requirements.txt --constraint "${CONSTRAINT_URL}"
+
+  23 |     
+
+  24 |     # Install the project source as a package
+
+--------------------
+
+target airflow-scheduler: failed to solve: process "/bin/bash -o pipefail -o errexit -o nounset -o nolog -c pip install --no-cache-dir --disable-pip-version-check -r /requirements.txt --constraint \"${CONSTRAINT_URL}\"" did not complete successfully: exit code: 1
