@@ -122,7 +122,7 @@ with TaskGroup('upload_to_gcs', dag=dag) as upload_group:
         task_id='upload_reference_data',
         bash_command="""
         cd /opt/airflow && \
-        python scripts/upload_to_gcs.py --data-type reference
+        python scripts/upload_to_gcs.py --reference-only
         """,
         dag=dag,
     )
@@ -133,7 +133,6 @@ with TaskGroup('upload_to_gcs', dag=dag) as upload_group:
         bash_command="""
         cd /opt/airflow && \
         python scripts/upload_to_gcs.py \
-            --data-type journeys \
             --year {{ ti.xcom_pull(task_ids='calculate_data_month')['year'] }} \
             --month {{ ti.xcom_pull(task_ids='calculate_data_month')['month'] }}
         """,
@@ -148,7 +147,7 @@ with TaskGroup('load_to_bigquery', dag=dag) as load_group:
         task_id='load_reference_tables',
         bash_command="""
         cd /opt/airflow && \
-        python scripts/load_to_bq.py --table-type reference
+        python scripts/load_to_bq.py --reference
         """,
         dag=dag,
     )
@@ -158,10 +157,7 @@ with TaskGroup('load_to_bigquery', dag=dag) as load_group:
         task_id='load_od_tables',
         bash_command="""
         cd /opt/airflow && \
-        python scripts/load_to_bq.py \
-            --table-type od \
-            --year {{ ti.xcom_pull(task_ids='calculate_data_month')['year'] }} \
-            --month {{ ti.xcom_pull(task_ids='calculate_data_month')['month'] }}
+        python scripts/load_to_bq.py --od
         """,
         dag=dag,
     )
