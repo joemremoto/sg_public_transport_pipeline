@@ -1,44 +1,23 @@
-#9 2.951 ERROR: Cannot install -r /requirements.txt (line 11) because these package versions have conflicting dependencies.
-#9 2.952 
-#9 2.952 The conflict is caused by:
-#9 2.952     dbt-core 1.9.0 depends on protobuf<6.0 and >=5.0
-#9 2.952     The user requested (constraint) protobuf==4.25.5
-#9 2.952 
-#9 2.952 To fix this you could try to:
-#9 2.952 1. loosen the range of package versions you've specified
-#9 2.952 2. remove package versions to allow pip to attempt to solve the dependency conflict
-#9 2.952 
-#9 2.952 ERROR: ResolutionImpossible: for help visit https://pip.pypa.io/en/latest/topics/dependency-resolution/#dealing-with-dependency-conflicts
-#9 ERROR: process "/bin/bash -o pipefail -o errexit -o nounset -o nolog -c pip install --no-cache-dir --disable-pip-version-check -r /requirements.txt --constraint \"${CONSTRAINT_URL}\"" did not complete successfully: exit code: 1
-------
- > [airflow-scheduler 4/5] RUN pip install --no-cache-dir --disable-pip-version-check -r /requirements.txt --constraint "https://raw.githubusercontent.com/apache/airflow/constraints-2.10.4/constraints-3.10.txt":
-2.952 
-2.952 The conflict is caused by:
-2.952     dbt-core 1.9.0 depends on protobuf<6.0 and >=5.0
-2.952     The user requested (constraint) protobuf==4.25.5
-2.952 
-2.952 To fix this you could try to:
-2.952 1. loosen the range of package versions you've specified
-2.952 2. remove package versions to allow pip to attempt to solve the dependency conflict
-2.952 
-2.952 ERROR: ResolutionImpossible: for help visit https://pip.pypa.io/en/latest/topics/dependency-resolution/#dealing-with-dependency-conflicts
-------
-[+] build 0/1
- - Image sg-transport-airflow:latest Building                                                                                                                                                                                   5.4s
-Dockerfile:22
-
---------------------
-
-  20 |     # Copy and install Python requirements with constraints
-
-  21 |     COPY airflow/requirements.txt /requirements.txt
-
-  22 | >>> RUN pip install --no-cache-dir --disable-pip-version-check -r /requirements.txt --constraint "${CONSTRAINT_URL}"
-
-  23 |     
-
-  24 |     # Install the project source as a package
-
---------------------
-
-target airflow-init: failed to solve: process "/bin/bash -o pipefail -o errexit -o nounset -o nolog -c pip install --no-cache-dir --disable-pip-version-check -r /requirements.txt --constraint \"${CONSTRAINT_URL}\"" did not complete successfully: exit code: 1
+airflow-scheduler-1  | PermissionError: [Errno 13] Permission denied: '/opt/airflow/logs/dag_processor_manager'
+airflow-scheduler-1  | [2026-04-16T03:47:00.801+0000] {manager.py:280} WARNING - DagFileProcessorManager (PID=12024) exited with exit code 1 - re-launching
+airflow-scheduler-1  | [2026-04-16T03:47:00.806+0000] {manager.py:174} INFO - Launched DagFileProcessorManager with pid: 12029
+airflow-scheduler-1  | Process ForkProcess-2325:
+airflow-scheduler-1  | Traceback (most recent call last):
+airflow-scheduler-1  |   File "/usr/local/lib/python3.10/multiprocessing/process.py", line 314, in _bootstrap
+airflow-scheduler-1  |     self.run()
+airflow-scheduler-1  |   File "/usr/local/lib/python3.10/multiprocessing/process.py", line 108, in run
+airflow-scheduler-1  |     self._target(*self._args, **self._kwargs)
+airflow-scheduler-1  |   File "/home/airflow/.local/lib/python3.10/site-packages/airflow/dag_processing/manager.py", line 237, in _run_processor_manager
+airflow-scheduler-1  |     reload_configuration_for_dag_processing()
+airflow-scheduler-1  |   File "/home/airflow/.local/lib/python3.10/site-packages/airflow/dag_processing/manager.py", line 1477, in reload_configuration_for_dag_processing
+airflow-scheduler-1  |     importlib.reload(import_module(airflow.settings.LOGGING_CLASS_PATH.rsplit(".", 1)[0]))  # type: ignore
+airflow-scheduler-1  |   File "/usr/local/lib/python3.10/importlib/__init__.py", line 169, in reload
+airflow-scheduler-1  |     _bootstrap._exec(spec, module)
+airflow-scheduler-1  |   File "<frozen importlib._bootstrap>", line 619, in _exec
+airflow-scheduler-1  |   File "<frozen importlib._bootstrap_external>", line 883, in exec_module
+airflow-scheduler-1  |   File "<frozen importlib._bootstrap>", line 241, in _call_with_frames_removed
+airflow-scheduler-1  |   File "/home/airflow/.local/lib/python3.10/site-packages/airflow/config_templates/airflow_local_settings.py", line 205, in <module>
+airflow-scheduler-1  |     Path(directory).mkdir(parents=True, exist_ok=True, mode=0o755)
+airflow-scheduler-1  |   File "/usr/local/lib/python3.10/pathlib.py", line 1175, in mkdir
+airflow-scheduler-1  |     self._accessor.mkdir(self, mode)
+airflow-scheduler-1  | PermissionError: [Errno 13] Permission denied: '/opt/airflow/logs/dag_processor_manager'
