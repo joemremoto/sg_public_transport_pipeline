@@ -14,7 +14,7 @@ USER airflow
 
 # Copy and install Python requirements
 COPY airflow/requirements.txt /requirements.txt
-RUN pip install --no-cache-dir -r /requirements.txt
+RUN pip install --no-cache-dir --disable-pip-version-check -r /requirements.txt
 
 # Install the project source as a package
 COPY --chown=airflow:root src /opt/airflow/src
