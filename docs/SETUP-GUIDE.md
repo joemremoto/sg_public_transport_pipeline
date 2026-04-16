@@ -24,7 +24,7 @@ Complete setup guide for cloning and running this project on a new machine with 
     - [Phase 3: Test GCS Upload](#phase-3-test-gcs-upload)
     - [Phase 4: Test BigQuery Load](#phase-4-test-bigquery-load)
     - [Phase 5: Test dbt Transformation](#phase-5-test-dbt-transformation)
-    - [Phase 6: Docker & Airflow Setup (Optional)](#phase-6-docker--airflow-setup-optional)
+    - [Phase 6: Docker & Airflow Setup](#phase-6-docker--airflow-setup)
     - [Phase 7: Test Streamlit Dashboard](#phase-7-test-streamlit-dashboard)
 11. [Troubleshooting](#troubleshooting)
 
@@ -57,7 +57,7 @@ Complete setup guide for cloning and running this project on a new machine with 
   - VS Code: https://code.visualstudio.com/
   - Cursor: https://cursor.sh/
 
-### Optional: For Airflow Orchestration (Phase 6)
+### For Airflow Orchestration (Phase 6)
 
 - **Docker Desktop** (for running Airflow)
   - Windows: https://docs.docker.com/desktop/install/windows-install/
@@ -625,9 +625,9 @@ dbt test
 
 ---
 
-## Phase 6: Docker & Airflow Setup (Optional)
+## Phase 6: Docker & Airflow Setup
 
-**Note:** This phase is optional. Airflow orchestrates the pipeline automatically, but you can run the pipeline manually without it.
+**Note:** Airflow orchestrates the pipeline automatically, but you can run the pipeline manually without it.
 
 ### Prerequisites
 
@@ -1175,7 +1175,7 @@ After successful setup:
    streamlit run app.py
    ```
 
-4. **Optional: Setup Airflow** (requires Docker or Cloud Composer)
+4. **Setup Airflow** (requires Docker)
 
 ---
 
