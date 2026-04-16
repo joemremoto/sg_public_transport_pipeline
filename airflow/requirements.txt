@@ -10,5 +10,9 @@ google-auth
 # HTTP client (let constraint file handle version)
 requests
 
+# Excel file parsing (for train stations extraction)
+xlrd==2.0.1
+openpyxl==3.1.2
+
 # Utilities
 python-dotenv==1.0.1
