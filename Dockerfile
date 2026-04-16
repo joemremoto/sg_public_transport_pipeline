@@ -17,9 +17,15 @@ ENV AIRFLOW_VERSION=2.10.4
 ENV PYTHON_VERSION=3.10
 ENV CONSTRAINT_URL="https://raw.githubusercontent.com/apache/airflow/constraints-${AIRFLOW_VERSION}/constraints-${PYTHON_VERSION}.txt"
 
-# Copy and install Python requirements with constraints
+# Copy requirements files
 COPY airflow/requirements.txt /requirements.txt
+COPY airflow/requirements-dbt.txt /requirements-dbt.txt
+
+# Install Airflow providers and GCP packages with constraints
 RUN pip install --no-cache-dir --disable-pip-version-check -r /requirements.txt --constraint "${CONSTRAINT_URL}"
+
+# Install dbt separately without constraints (it needs protobuf >=5.0)
+RUN pip install --no-cache-dir --disable-pip-version-check -r /requirements-dbt.txt
 
 # Install the project source as a package
 COPY --chown=airflow:root src /opt/airflow/src

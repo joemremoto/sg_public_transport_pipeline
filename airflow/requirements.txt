@@ -7,10 +7,6 @@ google-cloud-storage
 google-cloud-bigquery
 google-auth
 
-# dbt (these may need adjustment if constraints conflict)
-dbt-core==1.9.0
-dbt-bigquery==1.9.0
-
 # HTTP client (let constraint file handle version)
 requests
 
