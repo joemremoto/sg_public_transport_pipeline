@@ -317,8 +317,9 @@ class BigQueryLoader:
         This method:
         1. Ensures dataset exists
         2. Creates table if needed (with clustering on YEAR_MONTH)
-        3. Loads CSV file from GCS into table
-        4. Uses WRITE_APPEND mode (adds to existing data without deleting)
+        3. Deletes any existing data for the given year_month (prevents duplicates)
+        4. Loads CSV file from GCS into table
+        5. Uses WRITE_APPEND mode (adds to existing data without deleting other months)
         
         Parameters:
             mode (str): Transport mode ('bus' or 'train')
@@ -363,8 +364,23 @@ class BigQueryLoader:
         
         logger.info(f"  Source: {gcs_uri}")
         
-        # Step 4: Configure load job
+        # Step 4: Delete existing data for this month (to prevent duplicates)
         table_ref = f"{self.project_id}.{self.dataset_id}.{table_name}"
+        delete_query = f"""
+        DELETE FROM `{table_ref}`
+        WHERE YEAR_MONTH = '{year_month}'
+        """
+        
+        logger.info(f"  Deleting existing data for {year_month} (if any)...")
+        try:
+            delete_job = self.bq_client.query(delete_query)
+            delete_job.result()  # Wait for deletion to complete
+            logger.info(f"  ✓ Deleted existing rows for {year_month}")
+        except Exception as e:
+            # If table doesn't exist yet, deletion will fail - that's okay
+            logger.info(f"  No existing data to delete (table may not exist yet)")
+        
+        # Step 5: Configure load job
         
         job_config = bigquery.LoadJobConfig(
             # Schema configuration
@@ -387,7 +403,7 @@ class BigQueryLoader:
             # Note: This requires a truly unique combination of fields
         )
         
-        # Step 5: Start load job
+        # Step 6: Start load job
         logger.info(f"  Starting load job for {table_name} ({year_month})...")
         load_job = self.bq_client.load_table_from_uri(
             gcs_uri,
@@ -398,7 +414,7 @@ class BigQueryLoader:
         # Wait for job to complete
         load_job.result()
         
-        # Step 6: Report success
+        # Step 7: Report success
         destination_table = self.bq_client.get_table(table_ref)
         logger.info(
             f"✓ Loaded data into {self.dataset_id}.{table_name} "
