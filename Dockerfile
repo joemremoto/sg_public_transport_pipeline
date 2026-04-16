@@ -27,6 +27,9 @@ RUN pip install --no-cache-dir --disable-pip-version-check -r /requirements.txt 
 # Install dbt separately without constraints (it needs protobuf >=5.0)
 RUN pip install --no-cache-dir --disable-pip-version-check -r /requirements-dbt.txt
 
-# Install the project source as a package
+# Copy project files
 COPY --chown=airflow:root src /opt/airflow/src
+COPY --chown=airflow:root scripts /opt/airflow/scripts
+
+# Set Python path
 ENV PYTHONPATH="${PYTHONPATH}:/opt/airflow/src:/opt/airflow"
