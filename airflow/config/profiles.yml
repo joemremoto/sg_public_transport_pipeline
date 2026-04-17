@@ -1,4 +1,4 @@
-sg_transport:
+sg_transport_dbt:
   target: prod
   outputs:
     prod:

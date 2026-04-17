@@ -164,7 +164,7 @@ def main():
         "Top N Origins",
         min_value=10,
         max_value=50,
-        value=20,
+        value=10,
         step=5,
         help="Number of top origins to display in the chart"
     )
@@ -326,7 +326,7 @@ def main():
     st.markdown("""
     <div style='text-align: center; color: #666; font-size: 0.9rem;'>
         <p>📊 Data Source: LTA DataMall API | 🏗️ Built with Streamlit & BigQuery</p>
-        <p>Singapore Public Transport Analytics Pipeline - Phase 7</p>
+        <p>Singapore Public Transport Analytics Pipeline - Joseph Emmanuel Remoto</p>
     </div>
     """, unsafe_allow_html=True)
 

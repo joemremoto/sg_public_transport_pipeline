@@ -13,6 +13,7 @@ Schedule: Monthly on the 15th (after LTA releases previous month's data)
 
 from datetime import datetime, timedelta
 from pathlib import Path
+from dateutil.relativedelta import relativedelta
 
 from airflow import DAG
 from airflow.operators.python import PythonOperator
@@ -48,7 +49,8 @@ dag = DAG(
 def get_data_month(**context):
     """Get the data month (previous month from execution date)"""
     execution_date = context['execution_date']
-    data_month = execution_date - timedelta(days=execution_date.day)
+    # Get previous month using relativedelta for accurate month arithmetic
+    data_month = execution_date - relativedelta(months=1)
     return {
         'year': data_month.year,
         'month': data_month.month,
