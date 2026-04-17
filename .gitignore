@@ -177,7 +177,6 @@ airflow/*.db             # Airflow SQLite database (local only)
 airflow/*.pid            # Process ID files
 airflow/airflow.cfg      # Local Airflow config (use template instead)
 airflow/webserver_config.py  # Auto-generated webserver config
-.env.airflow             # Airflow environment variables (may contain secrets)
 
 # Airflow runtime directories
 airflow/__pycache__/     # Python cache in Airflow directory
@@ -331,7 +330,7 @@ postgres-data/
 # - airflow/README.md (documentation)
 
 # DO NOT commit:
-# - .env.airflow (contains credentials/secrets)
+# - .env (contains credentials/secrets)
 # - airflow/logs/ (runtime logs)
 # - airflow/*.db (local database files)
 # - docker-compose.override.yml (personal overrides)

@@ -15,11 +15,11 @@
 
 # Your GCP Project ID
 # Find it at: https://console.cloud.google.com/home/dashboard
-project_id = "sg-public-transport-pipeline"
+project_id = ""
 
 # Your email address (for BigQuery admin access)
 # Use the email you log into GCP with
-bq_admin_email = "your.email@example.com"
+bq_admin_email = ""
 
 # ============================================================================
 # OPTIONAL VARIABLES - Can use defaults or customize
@@ -38,11 +38,11 @@ bq_admin_email = "your.email@example.com"
 # gcs_bucket_processed = "sg-public-transport-data-processed-xyz123"
 
 # BigQuery Dataset Name
-# bq_dataset = "sg_public_transport_analytics"
+bq_dataset = "sg_public_transport_analytics"
 
 # Service Account Name
-# service_account_name = "sg-transport-pipeline"
-
+service_account_name = ""
+    
 # Environment (dev, staging, prod)
 # environment = "dev"
 
