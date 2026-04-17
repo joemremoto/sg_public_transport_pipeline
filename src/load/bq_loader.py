@@ -371,14 +371,24 @@ class BigQueryLoader:
         WHERE YEAR_MONTH = '{year_month}'
         """
         
-        logger.info(f"  Deleting existing data for {year_month} (if any)...")
+        logger.info(f"  🗑️  Deleting existing data for {year_month} (if any)...")
+        logger.info(f"     Query: DELETE FROM `{table_ref}` WHERE YEAR_MONTH = '{year_month}'")
         try:
             delete_job = self.bq_client.query(delete_query)
             delete_job.result()  # Wait for deletion to complete
-            logger.info(f"  ✓ Deleted existing rows for {year_month}")
+            deleted_rows = delete_job.num_dml_affected_rows or 0
+            logger.info(f"  ✅ Deleted {deleted_rows} existing rows for {year_month}")
         except Exception as e:
-            # If table doesn't exist yet, deletion will fail - that's okay
-            logger.info(f"  No existing data to delete (table may not exist yet)")
+            # Check if error is "table not found" - that's expected for first load
+            error_msg = str(e).lower()
+            if 'not found' in error_msg or 'does not exist' in error_msg:
+                logger.info(f"  ℹ️  Table doesn't exist yet - no data to delete")
+            else:
+                # Unexpected error - log it but don't fail (we can still try to load)
+                logger.error(f"  ❌ Failed to delete existing data: {e}")
+                logger.error(f"  ⚠️  Continuing with load anyway - THIS MAY CAUSE DUPLICATES!")
+                import traceback
+                traceback.print_exc()
         
         # Step 5: Configure load job
         
