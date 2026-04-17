@@ -1,1 +1,11 @@
-Failed to connect to BigQuery: Credentials file not found: C:\Users\Joseph\sg_public_transport_pipeline\streamlit_app./credentials/gcp-service-account.json Please ensure GOOGLE_APPLICATION_CREDENTIALS points to a valid file.
+SELECT 
+  YEAR_MONTH,
+  ORIGIN_PT_CODE,
+  DESTINATION_PT_CODE,
+  TIME_PER_HOUR,
+  DAY_TYPE,
+  COUNT(*) as duplicate_count
+FROM `sg-public-transport-pipeline.sg_public_transport_analytics.bus_od`
+GROUP BY YEAR_MONTH, ORIGIN_PT_CODE, DESTINATION_PT_CODE, TIME_PER_HOUR, DAY_TYPE
+HAVING COUNT(*) > 1
+LIMIT 10;
