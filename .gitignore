@@ -182,8 +182,8 @@ airflow/webserver_config.py  # Auto-generated webserver config
 airflow/__pycache__/     # Python cache in Airflow directory
 
 # Streamlit
-streamlit_app/.streamlit/secrets.toml  # Streamlit secrets (contains credentials)
-.streamlit/secrets.toml  # Alternative location for secrets
+streamlit_app/.streamlit/secrets.toml
+.streamlit/secrets.toml
 
 # Temporary files
 tmp/                     # Temporary directory
