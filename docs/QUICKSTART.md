@@ -107,10 +107,10 @@ python -m src.ingestion.extract_bus_stops
 python -m src.ingestion.extract_train_stations
 
 # Upload to GCS
-python scripts/upload_to_gcs.py --data-type reference
+python scripts/upload_to_gcs.py --reference-only
 
 # Load to BigQuery
-python scripts/load_to_bq.py --table-type reference
+python scripts/load_to_bq.py --reference
 
 # Run dbt (requires journey data - skip for now)
 cd sg_transport_dbt
@@ -137,8 +137,8 @@ python -m src.ingestion.extract_bus_od --year 2026 --month 1
 python -m src.ingestion.extract_train_od --year 2026 --month 1
 
 # Upload and load
-python scripts/upload_to_gcs.py --data-type journeys --year 2026 --month 1
-python scripts/load_to_bq.py --table-type od --year 2026 --month 1
+python scripts/upload_to_gcs.py --year 2026 --month 1
+python scripts/load_to_bq.py --od
 
 # Transform with dbt
 cd sg_transport_dbt

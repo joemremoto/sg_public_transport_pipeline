@@ -1,6 +1,6 @@
 # Current Project Status
 
-**Last Updated:** 2026-03-31
+**Last Updated:** April 17, 2026
 
 ---
 
@@ -230,7 +230,6 @@ journeys/
 - `airflow/config/profiles.yml` - dbt configuration
 - `airflow/config/ALERTING.md` - Alerting guide
 - `airflow/requirements.txt` - Python dependencies
-- `docs/phase6-airflow-setup.md` - Full documentation
 
 ---
 
@@ -288,7 +287,6 @@ journeys/
 - `streamlit_app/requirements.txt` - Dependencies
 - `streamlit_app/.streamlit/config.toml` - Theme config
 - `streamlit_app/README.md` - User guide
-- `docs/phase7-streamlit-setup.md` - Full documentation
 
 **Usage:**
 ```bash

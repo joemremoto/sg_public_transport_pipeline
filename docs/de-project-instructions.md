@@ -1,7 +1,5 @@
 ## Course Project
 
-[🎥 Projects how-to (watch it!)](https://www.youtube.com/watch?v=BL0E8xO8OnE)
-
 
 ### Objective
 
@@ -129,43 +127,3 @@ From Pável Kalmykov Razgovórov:
 * Run `docker compose up` at least once before submitting. One project had a SyntaxError in a config file that prevented any container from starting.
 * Keep your README consistent with the code. Watch out for docker-compose files pointing to old services, .env.example with wrong ports, or instructions referencing directories that don't exist.
 * If your dbt project uses external packages, make sure `dbt deps` runs somewhere. Two projects needed dbt_utils but never installed it.
-
-## Cheating and plagiarism
-
-Plagiarism in any form is not allowed. Examples of plagiarism:
-
-* Taking somebody's else notebooks and projects (in full or partly) and using it for the capstone project
-* Re-using your own projects (in full or partly) from other courses and bootcamps
-* Re-using your midterm project from ML Zoomcamp in capstone
-* Re-using your ML Zoomcamp from previous iterations of the course
-
-Violating any of this will result in 0 points for this project.
-
-## Resources
-
-### Datasets
-
-Refer to the provided [datasets](datasets.md) for possible selection.
-
-### Helpful Links
-
-* [Unit Tests + CI for Airflow](https://www.astronomer.io/events/recaps/testing-airflow-to-bulletproof-your-code/)
-* [CI/CD for Airflow (with Gitlab & GCP state file)](https://engineering.ripple.com/building-ci-cd-with-airflow-gitlab-and-terraform-in-gcp)
-* [CI/CD for Airflow (with GitHub and S3 state file)](https://programmaticponderings.com/2021/12/14/devops-for-dataops-building-a-ci-cd-pipeline-for-apache-airflow-dags/)
-* [CD for Terraform](https://medium.com/towards-data-science/git-actions-terraform-for-data-engineers-scientists-gcp-aws-azure-448dc7c60fcc)
-* [Spark + Airflow](https://medium.com/doubtnut/github-actions-airflow-for-automating-your-spark-pipeline-c9dff32686b)
-
-
-### Projects Gallery
-
-Explore a collection of projects completed by members of our community. The projects cover a wide range of topics and utilize different tools and techniques. Feel free to delve into any project and see how others have tackled real-world problems with data, structured their code, and presented their findings. It's a great resource to learn and get ideas for your own projects.
-
-[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://datatalksclub-projects.streamlit.app/)
-
-### DE Zoomcamp 2023
-
-* [2023 Projects](../cohorts/2023/project.md)
-
-### DE Zoomcamp 2022
-
-* [2022 Projects](../cohorts/2022/project.md)
