@@ -2,9 +2,11 @@
 BigQuery Connection Module for Streamlit Dashboard
 
 Handles connection to BigQuery and provides query functions for the dashboard.
+Supports both local development and Streamlit Cloud deployment.
 """
 
 import os
+import json
 from typing import Optional
 import pandas as pd
 from google.cloud import bigquery
@@ -17,14 +19,32 @@ def get_bigquery_client() -> bigquery.Client:
     """
     Initialize and cache BigQuery client.
     
-    Uses service account credentials from environment variable or
-    falls back to default credentials.
+    Supports two authentication methods:
+    1. Streamlit Cloud: Uses st.secrets
+    2. Local: Uses GOOGLE_APPLICATION_CREDENTIALS environment variable
     
     Returns:
         bigquery.Client: Authenticated BigQuery client
     """
-    credentials_path = os.getenv('GOOGLE_APPLICATION_CREDENTIALS')
     project_id = os.getenv('GCP_PROJECT_ID', 'sg-public-transport-pipeline')
+    
+    # Try Streamlit secrets first (for Streamlit Cloud)
+    if "gcp_service_account" in st.secrets:
+        try:
+            # Load credentials from Streamlit secrets
+            service_account_info = dict(st.secrets["gcp_service_account"])
+            credentials = service_account.Credentials.from_service_account_info(
+                service_account_info,
+                scopes=["https://www.googleapis.com/auth/bigquery"]
+            )
+            client = bigquery.Client(credentials=credentials, project=project_id)
+            return client
+        except Exception as e:
+            st.error(f"Failed to load credentials from Streamlit secrets: {e}")
+            raise
+    
+    # Fall back to local credentials file
+    credentials_path = os.getenv('GOOGLE_APPLICATION_CREDENTIALS')
     
     if credentials_path:
         # Handle relative paths - resolve from project root
@@ -41,19 +61,27 @@ def get_bigquery_client() -> bigquery.Client:
                 scopes=["https://www.googleapis.com/auth/bigquery"]
             )
             client = bigquery.Client(credentials=credentials, project=project_id)
+            return client
         else:
             raise FileNotFoundError(
                 f"Credentials file not found: {credentials_path}\n"
                 f"Please ensure GOOGLE_APPLICATION_CREDENTIALS points to a valid file."
             )
-    else:
-        # Fall back to default credentials (e.g., gcloud auth)
-        client = bigquery.Client(project=project_id)
     
-    return client
+    # Last resort: try default credentials (gcloud auth)
+    try:
+        client = bigquery.Client(project=project_id)
+        return client
+    except Exception as e:
+        st.error(
+            "❌ Could not authenticate to BigQuery. Please set up credentials:\n\n"
+            "**For Streamlit Cloud:** Add GCP service account JSON to secrets\n"
+            "**For Local Development:** Set GOOGLE_APPLICATION_CREDENTIALS in .env"
+        )
+        raise
 
 
-@st.cache_data(ttl=3600)
+@st.cache_data(ttl=3600, show_spinner="Querying BigQuery...")
 def query_bigquery(_client: bigquery.Client, query: str) -> pd.DataFrame:
     """
     Execute a BigQuery query and return results as DataFrame.
@@ -73,7 +101,7 @@ def query_bigquery(_client: bigquery.Client, query: str) -> pd.DataFrame:
         return pd.DataFrame()
 
 
-@st.cache_data(ttl=3600)
+@st.cache_data(ttl=3600, show_spinner="Loading available months...")
 def get_available_months(_client: bigquery.Client, mode: str) -> list:
     """
     Get list of available year_month values for a mode.
@@ -98,7 +126,7 @@ def get_available_months(_client: bigquery.Client, mode: str) -> list:
     return df['year_month'].tolist() if not df.empty else []
 
 
-@st.cache_data(ttl=3600)
+@st.cache_data(ttl=3600, show_spinner="Loading origin locations...")
 def get_origins(_client: bigquery.Client, mode: str, year_month: str, day_type: str) -> pd.DataFrame:
     """
     Get list of origin locations (stops or stations) with their names.
@@ -143,7 +171,7 @@ def get_origins(_client: bigquery.Client, mode: str, year_month: str, day_type: 
     return query_bigquery(_client, query)
 
 
-@st.cache_data(ttl=3600)
+@st.cache_data(ttl=3600, show_spinner="Analyzing trip counts...")
 def get_trip_count_by_origin(
     _client: bigquery.Client,
     mode: str,
@@ -204,7 +232,7 @@ def get_trip_count_by_origin(
     return query_bigquery(_client, query)
 
 
-@st.cache_data(ttl=3600)
+@st.cache_data(ttl=3600, show_spinner="Analyzing time periods...")
 def get_trip_count_by_time_period(
     _client: bigquery.Client,
     mode: str,
