@@ -29,9 +29,11 @@ def get_bigquery_client() -> bigquery.Client:
     if credentials_path:
         # Handle relative paths - resolve from project root
         if not os.path.isabs(credentials_path):
-            # Get project root (parent of streamlit_app directory)
-            current_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-            credentials_path = os.path.join(current_dir, credentials_path)
+            # Get project root (two levels up: utils -> streamlit_app -> project_root)
+            utils_dir = os.path.dirname(os.path.abspath(__file__))
+            streamlit_dir = os.path.dirname(utils_dir)
+            project_root = os.path.dirname(streamlit_dir)
+            credentials_path = os.path.join(project_root, credentials_path)
         
         if os.path.exists(credentials_path):
             credentials = service_account.Credentials.from_service_account_file(

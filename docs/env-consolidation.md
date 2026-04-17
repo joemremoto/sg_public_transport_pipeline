@@ -99,7 +99,10 @@ docker-compose up airflow-init
 cd streamlit_app
 streamlit run app.py
 # Should load credentials from parent .env
+# Path resolution: ./credentials/gcp-service-account.json relative to project root
 ```
+
+**Note:** The Streamlit app's `bigquery_client.py` automatically resolves relative paths from the project root, even when running from `streamlit_app/` directory.
 
 ## Future Considerations
 
