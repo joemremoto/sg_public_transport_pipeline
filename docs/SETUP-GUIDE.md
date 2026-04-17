@@ -1122,10 +1122,10 @@ python -m src.ingestion.extract_bus_stops
 python -m src.ingestion.extract_train_stations
 
 # Upload to GCS
-python scripts/upload_to_gcs.py --data-type reference
+python scripts/upload_to_gcs.py --reference-only
 
 # Load to BigQuery
-python scripts/load_to_bq.py --table-type reference
+python scripts/load_to_bq.py --reference
 
 # Run dbt
 cd sg_transport_dbt
@@ -1164,8 +1164,8 @@ After successful setup:
 
 2. **Run full pipeline:**
    ```bash
-   python scripts/upload_to_gcs.py --data-type journeys
-   python scripts/load_to_bq.py --table-type od
+   python scripts/upload_to_gcs.py --year 2026 --month 1
+   python scripts/load_to_bq.py --od
    cd sg_transport_dbt && dbt run && dbt test
    ```
 
@@ -1215,7 +1215,7 @@ Use this checklist to track your setup progress:
 
 ---
 
-**Last Updated:** 2026-03-31  
+**Last Updated:** April 17, 2026  
 **Version:** 1.0
 
 For questions or issues, refer to the troubleshooting section or check the project documentation in `docs/`.
