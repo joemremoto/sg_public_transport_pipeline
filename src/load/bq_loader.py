@@ -366,13 +366,19 @@ class BigQueryLoader:
         
         # Step 4: Delete existing data for this month (to prevent duplicates)
         table_ref = f"{self.project_id}.{self.dataset_id}.{table_name}"
+        
+        # Format year_month to match the raw data format (with hyphen: 2026-03)
+        year_month_with_hyphen = f"{year_month[:4]}-{year_month[4:]}"
+        
+        # Delete using BOTH formats to be safe (raw data has hyphen, but just in case)
         delete_query = f"""
         DELETE FROM `{table_ref}`
-        WHERE YEAR_MONTH = '{year_month}'
+        WHERE YEAR_MONTH = '{year_month_with_hyphen}' 
+           OR YEAR_MONTH = '{year_month}'
         """
         
         logger.info(f"  🗑️  Deleting existing data for {year_month} (if any)...")
-        logger.info(f"     Query: DELETE FROM `{table_ref}` WHERE YEAR_MONTH = '{year_month}'")
+        logger.info(f"     Query: DELETE FROM `{table_ref}` WHERE YEAR_MONTH IN ('{year_month_with_hyphen}', '{year_month}')")
         try:
             delete_job = self.bq_client.query(delete_query)
             delete_job.result()  # Wait for deletion to complete
